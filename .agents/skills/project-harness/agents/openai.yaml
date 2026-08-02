@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Harness"
+  short_description: "요구사항·디자인·흐름·검증과 기록을 연결합니다"
+  default_prompt: "Use $project-harness to capture the active requirement and design direction, choose the smallest valuable next step, verify it, and keep project records current."

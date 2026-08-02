@@ -1,0 +1,9 @@
+# Project-scoped Codex configuration.
+# Loaded only when this repository is trusted.
+
+[mcp_servers.notion]
+url = "https://mcp.notion.com/mcp"
+auth = "oauth"
+enabled = true
+required = false
+default_tools_approval_mode = "writes"
