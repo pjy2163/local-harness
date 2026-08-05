@@ -13,6 +13,7 @@ OAuth token이나 API secret은 이 파일에도 적지 않는다.
 | Sync mode | manual `local → Notion` |
 | Parent page | `NOT_CONFIGURED` |
 | Requirements database / data source | `NOT_CONFIGURED` |
+| Decisions database / data source | `NOT_CONFIGURED` |
 | Work Log database / data source | `NOT_CONFIGURED` |
 | Troubleshooting database / data source | `NOT_CONFIGURED` |
 | Last sync | `없음` |
@@ -20,6 +21,7 @@ OAuth token이나 API secret은 이 파일에도 적지 않는다.
 ## Verified property notes
 
 - Requirements:
+- Decisions:
 - Work Log:
 - Troubleshooting:
 

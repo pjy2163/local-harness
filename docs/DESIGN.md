@@ -196,7 +196,17 @@ Intentional deviations from common baseline:
 Visual verification method:
 ```
 
-## 13. Visual review checklist
+## 13. Landing page baseline
+
+Marketing·service landing page는 visual token만 공통화하지 않고 `docs/LANDING.md`의 정보 구조와 운영 경계 contract를 함께 사용한다. 프로젝트마다 핵심 약속과 실제 증거는 달라지지만 다음 원칙은 유지한다.
+
+- 한 명의 primary user, 하나의 핵심 문제와 하나의 primary CTA를 첫 화면에서 분명히 한다.
+- 제품이 실제로 작동하는 흐름과 증거를 추상적인 slogan보다 먼저 보여준다.
+- 지원/비지원 범위, 자동화/사람 책임, 데이터와 실패 동작을 숨겨진 약관이 아니라 신뢰 정보로 다룬다.
+- 운영 경계는 긴 경고문 대신 scan 가능한 표, 짧은 문장과 관련 FAQ로 나눈다.
+- 계획, mock, beta와 실제 제공 상태를 시각적으로 구분한다.
+
+## 14. Visual review checklist
 
 - [ ] 첫 화면에서 primary action과 정보 hierarchy가 분명하다.
 - [ ] 화면 대부분이 pure white 또는 cool near-white다.

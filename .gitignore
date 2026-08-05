@@ -20,6 +20,8 @@ id_ed25519
 docs/NOTION.local.md
 .codex/*
 !.codex/config.toml
+!.codex/agents/
+!.codex/agents/*.toml
 
 # Editor and operating-system files
 .DS_Store

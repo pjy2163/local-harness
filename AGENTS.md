@@ -23,6 +23,8 @@ AI가 코드를 대신 만드는 데서 끝내지 않고, 사람이 사용자 �
 5. 최근 실패가 관련되면 `docs/TROUBLESHOOTING.md`
 6. 실제 검증이 필요하면 `docs/EVIDENCE.md`
 7. Notion 동기화가 관련되고 파일이 있으면 `docs/NOTION.local.md`
+8. 랜딩페이지·서비스 소개·운영 경계가 관련되면 `docs/LANDING.md`
+9. 구현 위임·모델·책임 역할이 관련되면 `docs/AGENT_ROLES.md`
 
 빈 템플릿은 승인을 기다리지 말고 저장소와 사용자 요청에서 확인한 사실로 초기화한다. 추측은 `가정` 또는 `미확인`으로 표시한다.
 
@@ -65,6 +67,23 @@ AI는 선택지와 근거를 제안할 수 있지만 위 결정을 확정하지 
 - 테스트 결과와 다음 권장 행동
 - 작업일지, 트러블슈팅 후보와 포트폴리오 후보
 
+## Engineering defaults
+
+- 현재 승인된 요구사항을 완전히 충족하는 가장 단순한 구현을 선택한다. 실제 교체점이나 반복 책임이 없으면 추측성 추상화, 설정과 간접 계층을 만들지 않는다.
+- 작동하는 가장 작은 End-to-End 흐름에서 시작하고, 매 capability를 이미 작동하는 제품 위에 올린다. 다음 계층을 위해 현재의 작동 흐름을 미완성 상태로 바꾸지 않는다.
+- 모듈은 사용자 흐름과 책임 경계에 맞춰 나누되, 작은 코드를 파일 수와 wrapper로만 분산하지 않는다.
+- 새로 만들기 전에 프로젝트에 이미 있는 dependency의 문서·types·지원 범위를 확인한다. 검증된 유지보수 라이브러리가 전체 복잡도나 신뢰성 비용을 낮출 때 사용하고, 새 dependency는 대안과 유지 비용을 설명한다.
+- 승인된 현재 요구사항이 내부의 낡은 경로를 대체하면 사용되지 않는 fallback과 compatibility layer를 함께 제거한다. 단, 공개 API, 저장 데이터, 외부 소비자 계약을 깨거나 migration이 필요한 변경은 영향과 전환·rollback을 사람이 먼저 결정한다.
+- 장기적으로 유지할 수 없는 임시 stopgap을 기본 해법으로 남기지 않는다. 긴급 우회가 명시적으로 승인되면 owner, 제거 조건과 검증을 기록한다.
+
+## Agent role routing
+
+- project primary agent는 `.codex/config.toml`의 `gpt-5.6-sol` + `high`를 사용하고 문제·요구사항·책임·기획·중요한 결정·handoff와 최종 통합 검토를 소유한다.
+- 의미 있는 구현이나 UI·contract 구체화는 범위와 acceptance criteria가 잡힌 뒤 custom `implementer` agent에 위임한다. implementer는 `.codex/agents/implementer.toml`의 `gpt-5.6-luna` + `medium`을 사용한다.
+- primary는 `docs/AGENT_ROLES.md`의 bounded handoff를 제공하고 implementer의 변경·검증을 contract와 acceptance criteria로 다시 검토한다.
+- implementer는 priority, 새 업무 규칙, Source of Truth, 중요한 architecture·호환성·보안·비용·배포·외부 write를 결정하지 않는다. 필요하면 증거와 선택지를 primary에게 반환한다.
+- custom agent나 지정 모델을 현재 client에서 사용할 수 없으면 조용히 다른 모델로 대체하지 않고, 사용할 수 없는 설정과 대안을 사람에게 알린다.
+
 ## Requirements and priority
 
 - `docs/REQUIREMENTS.md`는 안정적인 요구사항 원장이고 `docs/STATE.md`는 현재 실행 상태다. 같은 내용을 두 문서에 반복하지 않는다.
@@ -75,10 +94,10 @@ AI는 선택지와 근거를 제안할 수 있지만 위 결정을 확정하지 
 
 ### Notion boundary
 
-- 로컬 `docs/REQUIREMENTS.md`, `docs/WORKLOG.md`, `docs/TROUBLESHOOTING.md`를 Source of Truth로 사용하고 Notion은 사람이 확인하는 mirror로 둔다.
+- 로컬 `docs/REQUIREMENTS.md`, `docs/DECISIONS.md`, `docs/WORKLOG.md`, `docs/TROUBLESHOOTING.md`를 Source of Truth로 사용하고 Notion은 사람이 확인하는 mirror로 둔다.
 - 실제 Notion page/database ID와 최근 sync 상태는 Git에서 제외되는 `docs/NOTION.local.md`에 둔다. 공개 예시는 `docs/NOTION.local.example.md`를 사용한다.
 - Notion database/page ID와 property 이름을 추측하지 않는다.
-- 기본 동기화는 수동 단방향이다. 요구사항은 `Requirement ID`, 작업일지는 `Local Entry ID`, 트러블슈팅은 `Incident ID`를 안정적인 키로 사용한다.
+- 기본 동기화는 수동 단방향이다. 요구사항은 `Requirement ID`, 기술 결정은 `Decision ID`, 작업일지는 `Local Entry ID`, 트러블슈팅은 `Incident ID`를 안정적인 키로 사용한다.
 - 양방향 sync, 자동 주기 실행, 삭제 전파 또는 Source of Truth 변경은 사람이 승인해야 한다.
 - 외부 쓰기 전 대상, 생성·수정 건수와 충돌을 확인하고 실행 결과를 sync log에 남긴다.
 
@@ -111,6 +130,13 @@ AI는 선택지와 근거를 제안할 수 있지만 위 결정을 확정하지 
 - 구현 전 핵심 화면과 loading/empty/error/success 상태를 정하고, 구현 후 실제 screenshot 또는 브라우저로 확인한다.
 - 유료 폰트, 외부 이미지와 브랜드 asset은 사용 권한을 확인한다.
 
+### Landing baseline
+
+- 랜딩페이지는 `docs/LANDING.md`의 공통 정보 구조를 사용하고 프로젝트의 약속, 증거와 운영 경계를 실제 사실로 초기화한다.
+- hero의 가치 제안부터 실제 작동 흐름, 증거, 운영 경계, FAQ와 CTA까지 하나의 서사로 연결한다.
+- 운영 경계에는 지원/비지원 범위, 자동화와 사람 책임, 데이터 출처·신선도, 실패·부분 실패, 개인정보·보관과 지원 채널을 필요한 만큼 명시한다.
+- 계획 중 기능, mock, beta 제약과 검증되지 않은 지표를 실제 제공 기능이나 성과처럼 표현하지 않는다.
+
 ## Testing as a map
 
 테스트 수보다 경계가 중요하다. 관련 있는 수준만 실행하고 각 테스트가 보장하지 않는 것도 기록한다.
@@ -135,6 +161,8 @@ AI는 선택지와 근거를 제안할 수 있지만 위 결정을 확정하지 
 | `docs/REQUIREMENTS.md` | 요구사항, acceptance criteria, priority, 상태 또는 Notion property contract가 바뀔 때 |
 | `docs/NOTION.local.md` | Notion 대상 ID, 연결 상태 또는 실제 sync 결과가 바뀔 때; Git에는 커밋하지 않음 |
 | `docs/DESIGN.md` | 공통 visual baseline 자체가 바뀔 때; 프로젝트별 선택은 해당 프로젝트 override에 기록 |
+| `docs/LANDING.md` | 공통 landing 정보 구조·운영 경계 baseline 또는 프로젝트 landing content contract가 바뀔 때 |
+| `docs/AGENT_ROLES.md` | model routing, 역할 책임, handoff 또는 escalation contract가 바뀔 때 |
 | `docs/SYSTEM_MAP.md` | 사용자 흐름, 데이터 출처, 계층 또는 contract가 바뀔 때 |
 | `docs/EVIDENCE.md` | 명령이나 입력으로 주장을 실제 검증했을 때 |
 | `docs/DECISIONS.md` | 사람이 중요한 선택이나 제외 이유를 확정했을 때 |

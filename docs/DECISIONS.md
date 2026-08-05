@@ -9,6 +9,10 @@
 | ADR-001 | 하나의 적응형 루프와 동적 상태를 사용한다 | `ACCEPTED` | template baseline |
 | ADR-002 | Notion은 로컬 원장의 수동 mirror로 시작한다 | `ACCEPTED` | template baseline |
 | ADR-003 | 공통 UI는 white/cool-neutral baseline에서 시작한다 | `ACCEPTED` | template baseline |
+| ADR-004 | 단순한 working layer와 명시적인 호환성 경계를 기본으로 한다 | `ACCEPTED` | 2026-08-05 |
+| ADR-005 | 기술 결정을 네 번째 Notion mirror database로 둔다 | `ACCEPTED` | 2026-08-05 |
+| ADR-006 | landing에 운영 경계를 포함한 공통 content contract를 사용한다 | `ACCEPTED` | 2026-08-05 |
+| ADR-007 | Sol owner와 Luna implementer로 책임과 실행을 분리한다 | `ACCEPTED` | 2026-08-05 |
 
 ## ADR-001: 고정 단계 대신 적응형 프로젝트 루프
 
@@ -25,8 +29,8 @@
 ## ADR-002: Notion은 수동 단방향 mirror로 시작
 
 - Status: `ACCEPTED`
-- Context: 요구사항, 작업일지와 트러블슈팅을 Notion과 연결하되 충돌 처리와 자동화 복잡도를 최소화해야 한다.
-- Decision: 로컬 Markdown을 Source of Truth로 유지하고 세 기록을 각각의 안정 ID로 수동 단방향 sync한다. 실제 Notion 대상과 sync 상태는 Git에서 제외되는 `docs/NOTION.local.md`에 둔다.
+- Context: 프로젝트 기록을 Notion과 연결하되 충돌 처리와 자동화 복잡도를 최소화해야 한다.
+- Decision: 로컬 Markdown을 Source of Truth로 유지하고 승인된 기록을 각각의 안정 ID로 수동 단방향 sync한다. 실제 Notion 대상과 sync 상태는 Git에서 제외되는 `docs/NOTION.local.md`에 둔다.
 - Why: 로컬 코드·검증 증거와 요구사항의 연결을 보존하면서 외부 문서 충돌과 의도하지 않은 삭제를 피하기 위해서다.
 - Alternatives: Notion canonical 또는 자동 양방향 sync.
 - Why excluded: 초기 프로젝트에서 충돌 해결, 삭제 전파, 권한과 자동 실행 상태가 추가돼 하네스가 과도하게 복잡해진다.
@@ -46,11 +50,64 @@
 - Verification: 실제 viewport screenshot에서 hierarchy, density, UI states, contrast와 responsive behavior를 검토한다.
 - Human confirmation: Zelt·Aqua Voice를 참고한 white 중심, beige 제외, 넉넉한 자간과 프로젝트별 변형을 공통 기준으로 사용한다.
 
+## ADR-004: 단순한 working layer와 명시적인 호환성 경계
+
+- Status: `ACCEPTED`
+- Requirement ID: `R-001`
+- Context: 추측성 추상화, 임시 fallback과 중복 구현은 작은 프로젝트의 설명 가능성과 장기 유지 비용을 악화시킨다. 반대로 모든 호환성과 migration을 무조건 제거하면 공개 계약과 저장 데이터의 소유 경계를 침범할 수 있다.
+- Decision: 현재 요구사항을 완전히 충족하는 가장 단순한 End-to-End 흐름에서 시작하고 capability를 작동하는 제품 위에 한 겹씩 추가한다. 기존 dependency의 문서와 types를 먼저 확인하고, 전체 복잡도를 낮추는 유지보수 library를 재사용한다. 승인된 내부 obsolete path는 fallback 없이 제거하되 공개 API·저장 데이터·외부 소비자 계약 파괴와 migration은 사람이 영향·전환·rollback을 결정한다.
+- Why: 단순성과 장기 구조를 얻으면서도 사용자 데이터와 외부 계약의 안전 경계를 보존하기 위해서다.
+- Alternatives: 낡은 경로를 무기한 유지하거나, 모든 기존 경로와 migration을 문맥 없이 즉시 제거한다.
+- Why excluded: 전자는 복잡도를 누적하고 후자는 호환성·데이터 손실 위험과 인간 소유 결정을 무시한다.
+- Risks: 내부/외부 계약의 구분이 불명확하면 제거 범위가 흔들릴 수 있다.
+- Verification: 실제 소비자와 데이터 출처를 추적하고, 제거 전 관련 contract/failure test와 rollback 요구를 확인한다.
+- Human confirmation: 2026-08-05 첨부 원칙을 하네스에 추가하라는 사용자 요청과 기존 ownership boundary를 함께 적용한다.
+
+## ADR-005: 기술 결정을 네 번째 Notion mirror database로 관리
+
+- Status: `ACCEPTED`
+- Requirement ID: `R-001`
+- Context: 로컬에는 ADR-lite가 있지만 Notion project hub에는 요구사항·작업일지·트러블슈팅만 있어 사람이 기술 선택과 대안을 한곳에서 확인하기 어렵다.
+- Decision: `docs/DECISIONS.md`를 Source of Truth로 유지하고 `Decision ID`를 안정 키로 쓰는 Decisions database를 수동 `local → Notion` mirror에 추가한다. AI는 `PROPOSED` 초안을 만들 수 있지만 사람의 근거 없이 `ACCEPTED`로 바꾸지 않는다.
+- Why: 요구사항, 구현 기록, 장애와 기술 선택을 같은 project hub에서 연결하되 로컬 코드 맥락과 인간 결정권을 유지하기 위해서다.
+- Alternatives: Work Log 본문에 결정을 섞거나 Notion을 결정의 Source of Truth로 바꾼다.
+- Why excluded: 안정 키와 상태 이력이 사라지거나 양방향 충돌·권한 복잡도가 생긴다.
+- Risks: 같은 결정이 로컬과 Notion에서 다르게 수정될 수 있다.
+- Verification: schema 비교, `Decision ID` upsert, write/read-back과 같은 키 재실행으로 중복과 상태를 확인한다.
+- Human confirmation: 2026-08-05 Notion page 생성 시 기술 결정 database를 추가해 달라는 사용자 요청.
+
+## ADR-006: 운영 경계를 포함한 공통 landing content contract
+
+- Status: `ACCEPTED`
+- Requirement ID: `R-001`
+- Context: visual baseline만으로는 프로젝트 landing이 무엇을 약속하고 어디까지 운영하는지 일관되게 설명하기 어렵다.
+- Decision: 특정 reference의 브랜드를 복제하지 않고 promise, working flow, proof, operating boundary, capability state, FAQ와 CTA를 연결하는 `docs/LANDING.md`를 공통 템플릿으로 사용한다. 지원/비지원, 자동화/사람 책임, 데이터, 실패, privacy/retention, availability와 support는 프로젝트 사실로 초기화한다.
+- Why: 세련된 화면뿐 아니라 사용자가 서비스의 실제 범위와 위험을 이해하고 행동할 수 있는 landing을 반복 가능하게 만들기 위해서다.
+- Alternatives: 프로젝트마다 자유 형식으로 작성하거나 운영 경계를 약관/FAQ에만 둔다.
+- Why excluded: 핵심 신뢰 정보가 누락되거나 실제 기능과 marketing claim이 분리된다.
+- Risks: 모든 행을 기계적으로 노출하면 작은 landing이 무거워질 수 있다.
+- Verification: 해당 없는 항목은 제거하되 중요한 미확인은 표시하고, 실제 flow/evidence와 content를 대조한 뒤 mobile·desktop·keyboard로 렌더링을 확인한다.
+- Human confirmation: 2026-08-05 en:ground처럼 운영 경계 등을 공통화할 landing template 요청.
+
+## ADR-007: Sol owner와 Luna implementer 역할 분리
+
+- Status: `ACCEPTED`
+- Requirement ID: `R-002`
+- Context: 구현 로그와 세부 수정이 주 thread의 요구사항·책임·결정 맥락을 흐릴 수 있고, 모든 작업에 같은 모델 깊이를 쓰면 비용과 속도를 조절하기 어렵다.
+- Decision: trusted project의 primary를 `gpt-5.6-sol` + `high`로 두어 문제·책임·기획·중요한 결정과 최종 acceptance를 소유하게 한다. 승인된 구현·구체화는 `gpt-5.6-luna` + `medium` custom `implementer`에 bounded handoff하고, Sol owner가 handback의 contract·검증과 남은 결정을 통합 검토한다.
+- Why: 인간 결정과 프로젝트 책임 맥락은 깊은 reasoning thread에 보존하면서, 명확하고 반복 가능한 구현은 빠른 모델로 분리하기 위해서다.
+- Alternatives: 단일 Sol agent가 전 과정을 수행하거나 모든 subagent의 global default를 Luna로 바꾼다.
+- Why excluded: 전자는 구현 소음과 비용을 집중시키고, 후자는 reviewer·decision 역할까지 Luna로 낮출 수 있다.
+- Risks: handoff가 불완전하면 Luna가 잘못된 범위를 구현하거나 결정이 반복 왕복될 수 있다. project config는 이미 시작된 session에 소급 적용되지 않을 수 있다.
+- Verification: TOML parsing, strict project config, local model catalog의 slug/effort, 새 session의 custom role discovery와 실제 spawn metadata를 순서대로 확인한다.
+- Human confirmation: 2026-08-05 구현·구체화는 Luna medium, 책임·결정·기획은 Sol high로 분리하라는 사용자 요청.
+
 ## ADR template
 
 ### ADR-000: 제목
 
 - Status: `PROPOSED`
+- Requirement ID:
 - Context:
 - Decision:
 - Why:
