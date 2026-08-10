@@ -1,6 +1,6 @@
 ---
 name: project-harness
-description: 프로젝트의 현재 상태를 AI가 유지하면서 요구사항·우선순위·Notion 동기화 경계, 공통 디자인과 프로젝트별 visual override, 사용자 흐름, 데이터 출처, API 계약, mock/real 경계, 테스트 증거와 사람 결정을 연결해 작업한다. 새 프로젝트 시작, 요구사항·UI 디자인 정리, 기존 기능 추적, 기능 구현, 디버깅, 검증, 작업일지·트러블슈팅·포트폴리오 정리가 필요할 때 사용한다.
+description: Terra-main의 LOW/MEDIUM contract·single-writer 구현, Luna의 닫힌 작업·독립 검증, sol_approver·sol_high의 제한적 approval·diagnosis를 요구사항·사용자 흐름·데이터 출처·테스트 증거·사람 결정에 연결한다. 새 프로젝트 시작, 기능 구현·디버그·검증과 작업 기록에 사용한다.
 ---
 
 # Run the project harness
@@ -72,21 +72,27 @@ landing page를 만들거나 바꿀 때는 `docs/LANDING.md`에서 해당 프로
 
 ## Route implementation by role
 
-- primary `gpt-5.6-sol` + `high` agent가 문제, 요구사항, priority 제안, 책임, 기획, 중요한 결정, acceptance와 인간 질문을 소유한다.
-- 의미 있는 구현·UI 구체화·configuration 변경은 `docs/AGENT_ROLES.md`의 handoff가 준비된 뒤 custom `implementer` agent에 위임한다. 이 agent는 `gpt-5.6-luna` + `medium`으로 실행한다.
-- handoff에는 Requirement ID, 사용자에게 보이는 결과, 허용 경계, 보존할 contract, acceptance criteria, 관련 검사와 out-of-scope를 포함한다.
-- implementer는 범위 안에서 코드와 테스트를 수행하고 결정이 필요한 지점을 owner에게 반환한다. primary는 결과를 독립적으로 검토하고 acceptance·상태·외부 기록을 책임진다.
-- agent/model을 현재 runtime에서 사용할 수 없으면 대체 model로 조용히 진행하지 않고 availability와 대안을 사람에게 알린다.
+- Terra-main (`gpt-5.6-terra`, `max`)은 기존 사람 결정 안의 `LOW/MEDIUM` task contract와 handoff를 조율하고, vertical slice·production/test·focused verification·fix·final regression의 기본 단일 write owner다.
+- Luna (`gpt-5.6-luna`, `max`, `fast` where supported)는 고정된 success/failure matrix, 반복 assertion, 좁은 stage·문서 sync 또는 독립 read-only contract/diff 검증만 맡는다. write stage를 맡으면 그 stage의 sole owner이며 Terra-main과 같은 worktree에서 병렬로 쓰지 않는다.
+- `sol_approver` (`gpt-5.6-sol`, `medium`)는 Terra/Luna evidence 뒤 `LOW/MEDIUM` final technical approval을 read-only로 수행한다. production/config/test write와 broad rerun은 하지 않는다.
+- `sol_high` (`gpt-5.6-sol`, `high`)는 `HIGH` risk의 business/security/authorization/money/concurrency/compatibility 판단 또는 같은 failure가 두 complete `fix → affected-test rerun` cycle 뒤에도 남은 경우에만 diagnosis·contract를 반환한다. 구현은 Terra-main 또는 Luna가 맡는다.
+- handoff에는 outcome, in/out of scope, fixed rules, acceptance, affected boundaries, risk, focused verification command와 escalation condition을 포함한다. 새 human-owned decision이 필요하면 임의로 채우지 않는다.
+- final order는 `Terra-main → Luna (적용 시) → sol_approver → Terra-main review packet → human acceptance`다. approval 전에는 work를 `ACTIVE`로 유지한다.
+
+## Keep commits reviewable
+
+- 하나의 commit은 하나의 사용자 행동·업무 규칙 또는 기술 경계다. non-generated text가 `600` changed lines 또는 `12` non-generated text files를 넘으면 split 또는 human review가 필요한 review stop이다.
+- staging 직전 `git diff --cached --check`, `bash scripts/check-commit-scope.sh --staged`, `git diff --cached --stat`, `git diff --cached`를 실행한다. `--allow-large --reason "..."`은 기술적 사유만 기록하며 user agreement를 대신하지 않는다.
 
 ## Verify by boundary
 
 변경한 경계에 비례해 Unit, Contract, Integration, E2E, Failure 검사를 선택한다.
 
-1. 먼저 기존 실패를 재현하거나 기대 결과를 명시한다.
-2. 관련 검증 명령을 실제로 실행한다.
-3. 각 검사가 보장하는 것과 보장하지 않는 것을 구분한다.
-4. 실행 결과를 `docs/EVIDENCE.md`에 추가한다. 실행하지 않은 검사는 `PASS`로 쓰지 않는다.
-5. 실패하면 원인을 좁혀 최소 수정하고 관련 검사와 필요한 회귀 검사를 재실행한다.
+1. Terra-main contract에서 risk를 정한다: `LOW`는 affected unit·static check, `MEDIUM`은 unit·contract·related integration, `HIGH`는 success/failure/authorization/transaction/concurrency targeted test와 actual integration을 기본으로 한다.
+2. 먼저 기존 failure를 재현하거나 기대 결과를 명시하고 focused check를 실제 실행한다. 각 검사가 보장하는 것과 보장하지 않는 것을 구분한다.
+3. 최초 재현은 retry로 세지 않는다. 같은 failure가 두 complete `fix → affected-test rerun` cycle 뒤에도 남으면 patch를 넓히지 않고 `sol_high`에 evidence·attempted delta·narrowest boundary를 올린다.
+4. final candidate에서 full regression을 한 번 실행한다. 후보가 바뀐 경우에만 affected check와 full regression을 다시 실행한다. 같은 성공본을 역할별로 반복하지 않는다.
+5. 실행 결과를 `docs/EVIDENCE.md`에 기록한다. 실행하지 않은 검사는 `PASS`로 쓰지 않는다.
 
 독립 검증이나 읽기 전용 리뷰를 요청받으면 제품 소스를 수정하지 않고 실패 재현과 근거만 보고한다.
 

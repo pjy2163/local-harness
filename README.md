@@ -2,7 +2,7 @@
 
 AI가 코드를 만드는 데서 끝내지 않고, 사람이 사용자 흐름·데이터 출처·계약·실패 경로를 설명하고 소유하도록 돕는 경량 공통 템플릿이다.
 
-Current template version: **v1.1.0**
+Current template version: **v1.2.0**
 
 ## What it keeps connected
 
@@ -14,7 +14,7 @@ Current template version: **v1.1.0**
 - 작업일지, 트러블슈팅과 포트폴리오 기록
 - white/cool-neutral 공통 디자인과 프로젝트별 override
 - 가치 제안·증거·운영 경계를 연결하는 공통 landing template
-- Sol/high owner와 Luna/medium implementer 사이의 책임·handoff contract
+- Terra-main, Luna, `sol_approver`, `sol_high`의 제한된 multi-stage contract
 - 선택적인 Notion 수동 mirror
 
 ## Structure
@@ -23,9 +23,9 @@ Current template version: **v1.1.0**
 AGENTS.md                    공통 작업·Git·보안·사람 소유 원칙
 .agents/skills/project-harness/
                              요청에 맞춰 다음 행동을 고르는 통합 스킬
-.codex/config.toml           Sol/high primary와 프로젝트 전용 Notion MCP 설정
-.codex/agents/implementer.toml
-                             Luna/medium 구현 전용 custom agent
+.codex/config.toml           Terra-main default와 프로젝트 전용 Notion MCP 설정
+.codex/agents/{luna-max,sol-approver,sol-high}.toml
+                             닫힌 Luna stage와 읽기 전용·HIGH Sol 역할
 docs/STATE.md                AI가 유지하는 현재 상태
 docs/AGENT_ROLES.md          모델별 책임, handoff와 escalation contract
 docs/REQUIREMENTS.md         요구사항 원장과 Notion property contract
@@ -40,13 +40,14 @@ docs/TROUBLESHOOTING.md      재사용할 문제 해결 기록
 docs/PORTFOLIO.md            포트폴리오 후보
 scripts/verify.sh            프로젝트 검증 진입점
 scripts/check-public.sh      커밋 후보의 기본 공개 안전 검사
+scripts/check-commit-scope.sh staged diff의 review-stop 검사
 ```
 
 ## Start a project
 
 1. 기존 프로젝트의 규칙과 문서를 확인하고 파일을 덮어쓰기보다 병합한다.
 2. `docs/STATE.md`와 `docs/REQUIREMENTS.md`를 실제 프로젝트 사실로 초기화한다.
-3. trusted project에서 새 Codex session을 열어 `.codex/config.toml`과 `implementer` custom agent를 로드한다.
+3. trusted project에서 새 Codex session을 열어 `.codex/config.toml`과 named role configs를 로드한다.
 4. UI 작업이면 `docs/DESIGN.md`의 공통 기준에서 프로젝트별 선택만 override한다.
 5. landing 작업이면 `docs/LANDING.md`의 약속·작동 흐름·증거·운영 경계를 실제 사실로 초기화한다.
 6. 자동 탐지할 수 없는 검증 명령은 `scripts/verify.project.sh`에 둔다.
@@ -58,7 +59,7 @@ $project-harness 현재 저장소와 내 요청을 기준으로 상태를 잡고
 중요한 구현 범위와 업무 결정은 내가 선택할 수 있게 남겨줘.
 ```
 
-Sol/high primary가 문제·범위·책임·기획과 결정을 유지하고, 승인된 구현·구체화만 Luna/medium `implementer`에 bounded handoff한다. 완료 후 다음 요구사항을 자동으로 구현하지 않으며 고정된 병렬 agent 수나 작업 카드를 전제하지 않는다.
+Terra-main이 일반 구현과 final regression의 single write owner다. Luna는 닫힌 stage 또는 independent read-only verification만 맡고, `sol_approver`는 evidence-based final approval, `sol_high`는 정의된 HIGH/repeated-failure escalation만 맡는다. 완료 후 다음 요구사항을 자동으로 구현하지 않는다.
 
 ## Optional Notion mirror
 
@@ -75,6 +76,7 @@ Sol/high primary가 문제·범위·책임·기획과 결정을 유지하고, �
 
 ```bash
 ./scripts/check-public.sh
+bash scripts/check-commit-scope.sh --range HEAD
 ./scripts/verify.sh
 ```
 
@@ -84,6 +86,12 @@ Sol/high primary가 문제·범위·책임·기획과 결정을 유지하고, �
 
 ## Release history
 
+### v1.2.0 — 2026-08-10
+
+- Terra-main의 single-writer 구현과 제한된 Luna·`sol_approver`·`sol_high` 역할 경계를 추가했다.
+- focused-first verification, read-only final approval, human acceptance와 repeated-failure escalation을 연결했다.
+- `scripts/check-commit-scope.sh`와 staged `600` text lines / `12` text files review-stop gate를 추가했다.
+
 ### v1.1.0 — 2026-08-05
 
 초기 하네스의 local Source of Truth와 사람 소유 경계를 유지하면서, 프로젝트 운영과 구현 위임에 필요한 공통 contract를 확장했다.
@@ -91,8 +99,8 @@ Sol/high primary가 문제·범위·책임·기획과 결정을 유지하고, �
 - Engineering defaults: 가장 작은 working E2E, 추측성 추상화 억제, 기존 dependency 우선, 승인된 내부 obsolete path 제거와 공개 계약 migration의 사람 결정 경계를 추가했다.
 - Notion project hub: Requirements, Decisions, Work Log, Troubleshooting 네 database blueprint와 `Decision ID` 기반 기술 결정 mirror를 추가했다.
 - Landing template: 가치 제안, 실제 flow, 증거, 지원/비지원, 자동화/사람 책임, 데이터·보관, 실패·부분 실패와 support를 연결하는 `docs/LANDING.md`를 추가했다.
-- Agent routing: 책임·기획·중요한 결정과 최종 acceptance는 Sol/high primary가 소유하고, 승인된 구현·구체화는 Luna/medium `implementer`가 수행하도록 분리했다.
-- Verification: Codex config loader, local model catalog와 ephemeral strict-config spawn으로 `implementer`의 실제 `gpt-5.6-luna` / `medium` 실행을 확인했다.
+- Agent routing: v1.2.0에서 교체된 predecessor two-role routing을 도입했다.
+- Verification: predecessor role configuration을 당시 runtime에서 확인했다.
 - Public boundary: 실제 Notion page/database ID, OAuth token과 개인 연결 상태는 계속 `docs/NOTION.local.md`에만 두고 Git에서 제외한다.
 
 Upgrade notes:

@@ -49,13 +49,12 @@ $project-harness [사용자]가 [행동]해서 [결과]를 얻는 가장 얇은 
 중요한 업무 규칙이나 호환성을 깨는 선택만 내게 물어봐.
 ```
 
-## Use the owner / implementer split
+## Use the multi-stage review loop
 
 ```text
-$project-harness 이 요청의 문제, 책임, 요구사항, acceptance와 중요한 결정은 primary owner가 정리해줘.
-구현 가능한 경계가 잡히면 docs/AGENT_ROLES.md 형식으로 custom implementer에게 handoff하고,
-implementer가 반환한 변경과 검증을 owner가 contract·acceptance 기준으로 다시 검토해줘.
-결정이 필요한 항목은 Luna가 선택하지 말고 Sol owner를 통해 나에게 돌려줘.
+$project-harness Terra-main이 기존 결정 안에서 LOW/MEDIUM task contract와 single write owner를 정해줘.
+Luna는 닫힌 stage 또는 독립 read-only verification에만 쓰고, final evidence는 sol_approver가 read-only로 검토해줘.
+새 business/security/compatibility 판단이나 두 complete fix→affected-test cycles 뒤에도 남는 failure만 sol_high 또는 나에게 올려줘.
 ```
 
 ## Establish a project design direction

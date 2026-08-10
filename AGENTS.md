@@ -76,13 +76,15 @@ AI는 선택지와 근거를 제안할 수 있지만 위 결정을 확정하지 
 - 승인된 현재 요구사항이 내부의 낡은 경로를 대체하면 사용되지 않는 fallback과 compatibility layer를 함께 제거한다. 단, 공개 API, 저장 데이터, 외부 소비자 계약을 깨거나 migration이 필요한 변경은 영향과 전환·rollback을 사람이 먼저 결정한다.
 - 장기적으로 유지할 수 없는 임시 stopgap을 기본 해법으로 남기지 않는다. 긴급 우회가 명시적으로 승인되면 owner, 제거 조건과 검증을 기록한다.
 
-## Agent role routing
+## Multi-stage agent routing
 
-- project primary agent는 `.codex/config.toml`의 `gpt-5.6-sol` + `high`를 사용하고 문제·요구사항·책임·기획·중요한 결정·handoff와 최종 통합 검토를 소유한다.
-- 의미 있는 구현이나 UI·contract 구체화는 범위와 acceptance criteria가 잡힌 뒤 custom `implementer` agent에 위임한다. implementer는 `.codex/agents/implementer.toml`의 `gpt-5.6-luna` + `medium`을 사용한다.
-- primary는 `docs/AGENT_ROLES.md`의 bounded handoff를 제공하고 implementer의 변경·검증을 contract와 acceptance criteria로 다시 검토한다.
-- implementer는 priority, 새 업무 규칙, Source of Truth, 중요한 architecture·호환성·보안·비용·배포·외부 write를 결정하지 않는다. 필요하면 증거와 선택지를 primary에게 반환한다.
-- custom agent나 지정 모델을 현재 client에서 사용할 수 없으면 조용히 다른 모델로 대체하지 않고, 사용할 수 없는 설정과 대안을 사람에게 알린다.
+- Terra-main은 `.codex/config.toml`의 `gpt-5.6-terra` + `max`로 기존 사람 결정 안의 `LOW/MEDIUM` task contract와 handoff를 조율하고, production·test·focused verification·fix·final regression의 기본 단일 write owner다.
+- Luna는 `gpt-5.6-luna` + `max`와 지원 surface의 `fast` tier로 닫힌 success/failure matrix, 반복 assertion, 좁은 작업 또는 독립 read-only contract/diff 검증만 맡는다. Luna write stage는 그 stage의 유일한 write owner이며 Terra-main과 같은 worktree에서 병렬로 쓰지 않는다.
+- `sol_approver`는 `gpt-5.6-sol` + `medium`의 read-only final technical approver다. evidence·contract·Luna findings로 `LOW/MEDIUM`을 검토하며 production/config/test write나 broad rerun을 하지 않는다.
+- `sol_high`는 `gpt-5.6-sol` + `high`로 `HIGH` 위험의 business/security/authorization/money/concurrency/compatibility 판단 또는 같은 failure가 두 complete `fix → affected-test rerun` cycle 뒤에도 남은 경우에만 diagnosis·contract를 반환한다. 구현은 Terra-main 또는 닫힌 Luna stage가 맡는다.
+- task contract에는 outcome, in/out of scope, fixed rules, acceptance, affected boundaries, risk, verification command와 escalation condition을 적는다. 새 업무 규칙·architecture·security·compatibility 판단은 구현 전에 `sol_high` 또는 사람에게 올린다.
+- focused verification을 먼저 실행하고 최종 후보에서 full regression은 한 번만 실행한다. final handoff는 `Terra-main → Luna (적용 시) → sol_approver → review packet → human acceptance`이며 승인 전에는 work를 `ACTIVE`로 유지한다.
+- 지정 모델을 현재 surface에서 쓸 수 없으면 더 높은 capability tier로만 대체하고 handoff에 기록한다. `sol_high`가 필요한 판단을 낮은 tier로 자동 하향하지 않는다.
 
 ## Requirements and priority
 
@@ -151,6 +153,9 @@ AI는 선택지와 근거를 제안할 수 있지만 위 결정을 확정하지 
 
 실행하지 않은 검사는 `PASS`로 기록하지 않는다. 실패한 테스트를 삭제하거나 우회해 성공으로 만들지 않는다.
 
+- `LOW`는 affected unit·static check, `MEDIUM`은 affected unit·contract·관련 integration, `HIGH`는 성공·실패·권한·transaction·concurrency targeted test와 실제 integration을 기본으로 한다.
+- 최초 실패 재현은 retry로 세지 않는다. 같은 failure가 두 complete `fix → affected-test rerun` cycle 뒤에도 남으면 patch를 넓히지 않고 failure evidence, attempted delta와 가장 좁은 unresolved boundary를 `sol_high`에 올린다.
+
 ## Documentation policy
 
 모든 문서를 매번 수정하지 않는다.
@@ -180,6 +185,9 @@ AI는 선택지와 근거를 제안할 수 있지만 위 결정을 확정하지 
 - `.codex/config.toml`에는 공개 가능한 서버 설정만 두고 OAuth token이나 개인 workspace 식별자를 넣지 않는다.
 - 의존성 추가는 기존 도구로 해결할 수 없는지와 유지 비용을 먼저 확인한다.
 - 인증·권한·결제·개인정보·운영 데이터 변경은 구현 전에 영향과 rollback을 사람에게 확인한다.
+- 하나의 commit은 하나의 사용자 행동·업무 규칙 또는 기술 경계와 그 검증만 담는다. dependency manifest와 lockfile은 별도 boundary가 기본이다.
+- 비생성 text diff가 `600` changed lines 또는 `12` non-generated text files를 넘으면 split 또는 human review가 필요한 review stop이다. 분할할 수 없는 예외는 사유·검토 경로·사용자 동의를 review packet에 남긴다.
+- staging 직전에는 `git diff --cached --check`, `bash scripts/check-commit-scope.sh --staged`, `git diff --cached --stat`, `git diff --cached` 순서로 확인한다. scope 검사 실패의 기본 해결은 split이며 `--allow-large --reason "..."`은 사용자 동의를 대신하지 않는다.
 - 커밋이나 push는 사용자가 요청한 경우에만 수행한다.
 
 ## Ask the human only when needed

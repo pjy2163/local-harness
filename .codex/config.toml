@@ -1,17 +1,16 @@
 # Project-scoped Codex configuration.
 # Loaded only when this repository is trusted.
 
-# The primary thread owns problem framing, scope, planning, decisions,
-# integration review, and final accountability.
-model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+# Terra-main owns LOW/MEDIUM contracts, implementation, focused verification,
+# final regression, and the handoff to the read-only Sol roles.
+model = "gpt-5.6-terra"
+model_reasoning_effort = "max"
 
 [agents]
 enabled = true
-
-[agents.implementer]
-description = "Implement owner-approved code, UI, configuration, and tests without making product or architecture decisions."
-config_file = "./agents/implementer.toml"
+max_concurrent_threads_per_session = 3
+default_subagent_model = "gpt-5.6-terra"
+default_subagent_reasoning_effort = "max"
 
 [mcp_servers.notion]
 url = "https://mcp.notion.com/mcp"
