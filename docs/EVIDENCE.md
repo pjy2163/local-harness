@@ -4,15 +4,20 @@
 
 ## Current verification summary
 
-- Last verified at: `2026-08-05 17:15 KST`
-- Revision or working tree: `8952d49 + working tree`
-- Overall: `PASS` for local template, agent configuration and role spawn
-- Unverified claims: 실제 Notion Decisions DB 생성/schema/read-back, 특정 프로젝트 landing 렌더링과 CTA 동작, 실제 feature handoff의 품질·latency
+- Last verified at: `2026-08-10` (accepted v1.2 baseline)
+- Revision or working tree: `codex/harness-common-v1-2 + working tree`
+- Overall: `PASS` for v1.2 static contract, public boundary, scope-gate and independent technical approval
+- Unverified claims: named-role runtime discovery, template product verification, actual feature handoff quality·latency, Notion external schema/write
 
 ## Execution log
 
 | Time | User flow or boundary | Command / input | Expected | Actual | Status |
 |---|---|---|---|---|---|
+| 2026-08-10 | v1.2 static contract / public boundary | `git diff --check`; `bash -n` for common scripts; `./scripts/check-public.sh`; active-route scan | no whitespace/syntax/public/stale-route issue | all checks passed | `PASS` |
+| 2026-08-10 | v1.2 review-unit scope | disposable Git indexes with `git diff --cached --check` and `bash scripts/check-commit-scope.sh --staged` | Unit 1 ≤ 12 files/600 text lines; Unit 2 separately reviewable; real index unchanged | Unit 1 `12` files / `429` text lines; Unit 2 `2` files / `110` text lines; no real staging | `PASS` |
+| 2026-08-10 | README scope-script invocation | `bash scripts/check-commit-scope.sh --range HEAD` after README fix | documented command succeeds | exit 0 | `PASS` |
+| 2026-08-10 | v1.2 role config / independent review | strict Codex config acceptance; Luna delta re-review | config accepted; no unresolved finding | `codex --strict-config exec --help` accepted; Luna `PASS` | `PASS` |
+| 2026-08-10 | final technical approval | `sol_approver` evidence/contract review | no unresolved `BLOCKER` / `MUST` | `APPROVED`; no findings | `PASS` |
 | 2026-08-05 15:49 KST | 공개 저장소 안전 경계 | `./scripts/check-public.sh` | 흔한 secret·개인 경로·Notion link 없음 | 해당 패턴 없음 | `PASS` |
 | 2026-08-05 15:49 KST | script syntax | `bash -n scripts/check-public.sh scripts/verify.sh` | shell syntax valid | exit 0 | `PASS` |
 | 2026-08-05 15:49 KST | public docs reference | `rg`로 `docs/*.md` reference 추출 후 존재 확인 | optional local 파일 외 모든 참조 존재 | missing 0 | `PASS` |
@@ -29,11 +34,13 @@
 
 | Time | Reproduction | Root cause | Smallest fix | Retest | Result |
 |---|---|---|---|---|---|
+| 2026-08-10 | Luna ran `./scripts/check-commit-scope.sh --range HEAD` | new script was mode `100644`, while README invoked it directly | README command changed to `bash scripts/check-commit-scope.sh --range HEAD` | exact Bash command and Luna delta re-review | `PASS` |
 | 2026-08-05 17:03 KST | 첫 ephemeral custom role spawn | implementer file의 disabled Notion MCP table에 transport 정보가 없음 | disabled MCP에도 `url`/`auth`를 명시 | config loader + strict-config spawn 재실행 | `PASS` |
 
 ## Remaining verification gaps
 
 - 현재 연결된 Notion에는 Decisions database/data source가 아직 없어 외부 schema와 idempotency를 검증하지 않았다.
 - 특정 프로젝트 landing 코드가 없으므로 mobile/desktop, keyboard, CTA state와 실제 claim 대조는 실행하지 않았다.
-- `scripts/verify.sh`의 제품별 검사 경계는 이 template을 적용할 프로젝트에서 정한다.
-- 실제 feature를 Luna에 handoff했을 때의 code quality, latency와 decision round-trip은 다음 구현에서 측정한다.
+- named-role runtime discovery는 새 trusted runtime/session 환경이 없어 `NOT_RUN`이며, 이 문서는 actual spawn model/effort를 주장하지 않는다.
+- `scripts/verify.sh`는 template에 product manifest가 없어 expected exit `2`로 `NOT_RUN`이다.
+- 실제 feature를 Luna에 handoff했을 때의 code quality, latency와 decision round-trip은 다음 구현에서 측정한다. Notion external sync는 실행하지 않았다.

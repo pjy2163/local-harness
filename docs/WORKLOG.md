@@ -16,6 +16,18 @@
 - Remaining:
 - Notion: `미동기화 | local page URL`
 
+### 2026-08-10 — v1.2 multi-stage routing과 commit-scope gate
+
+- Local Entry ID: `2026-08-10/harness-v1-2-routing`
+- Requirement ID: `R-003`
+- User value: 일반 구현의 단일 write owner와 독립 검토·HIGH escalation 경계가 공통 하네스에서 명확해졌다.
+- What changed: Terra-main default, 제한된 Luna·Sol role configs, focused-first review loop와 staged commit-scope gate를 추가하고 v1.1 two-role routing을 supersede했다.
+- Flow / contract affected: 사용자 요청 → Terra-main contract/implementation → Luna (적용 시) → `sol_approver` → human acceptance; `sol_high`는 defined HIGH/repeated-failure escalation만 맡는다.
+- Verification: static/public/scope checks `PASS`; direct script invocation failure를 README Bash command으로 수정 후 Luna re-review `PASS`; `sol_approver` final approval `APPROVED`.
+- Model provenance: Terra-main `gpt-5.6-terra` / `max` single write; Luna `gpt-5.6-luna` / `max` / supported `fast` independent review; `sol_approver` `gpt-5.6-sol` / `medium` read-only approval; main model/effort `미확인`.
+- Remaining: named-role runtime discovery `NOT_RUN`; template product verification은 product manifest가 없어 `NOT_RUN`.
+- Notion: `미동기화 — external sync not requested`
+
 ### 2026-08-05 — Sol owner / Luna implementer 역할 라우팅
 
 - Local Entry ID: `2026-08-05/sol-luna-agent-routing`

@@ -12,7 +12,8 @@
 | ADR-004 | 단순한 working layer와 명시적인 호환성 경계를 기본으로 한다 | `ACCEPTED` | 2026-08-05 |
 | ADR-005 | 기술 결정을 네 번째 Notion mirror database로 둔다 | `ACCEPTED` | 2026-08-05 |
 | ADR-006 | landing에 운영 경계를 포함한 공통 content contract를 사용한다 | `ACCEPTED` | 2026-08-05 |
-| ADR-007 | Sol owner와 Luna implementer로 책임과 실행을 분리한다 | `ACCEPTED` | 2026-08-05 |
+| ADR-007 | Sol owner와 Luna implementer로 책임과 실행을 분리한다 | `SUPERSEDED` | 2026-08-05 |
+| ADR-008 | Terra-main·Luna·Sol multi-stage routing과 commit-scope gate를 사용한다 | `ACCEPTED` | 2026-08-10 |
 
 ## ADR-001: 고정 단계 대신 적응형 프로젝트 루프
 
@@ -91,8 +92,9 @@
 
 ## ADR-007: Sol owner와 Luna implementer 역할 분리
 
-- Status: `ACCEPTED`
+- Status: `SUPERSEDED`
 - Requirement ID: `R-002`
+- Superseded by: `ADR-008` (2026-08-10). 아래 detail은 v1.1 기록으로 보존한다.
 - Context: 구현 로그와 세부 수정이 주 thread의 요구사항·책임·결정 맥락을 흐릴 수 있고, 모든 작업에 같은 모델 깊이를 쓰면 비용과 속도를 조절하기 어렵다.
 - Decision: trusted project의 primary를 `gpt-5.6-sol` + `high`로 두어 문제·책임·기획·중요한 결정과 최종 acceptance를 소유하게 한다. 승인된 구현·구체화는 `gpt-5.6-luna` + `medium` custom `implementer`에 bounded handoff하고, Sol owner가 handback의 contract·검증과 남은 결정을 통합 검토한다.
 - Why: 인간 결정과 프로젝트 책임 맥락은 깊은 reasoning thread에 보존하면서, 명확하고 반복 가능한 구현은 빠른 모델로 분리하기 위해서다.
@@ -101,6 +103,19 @@
 - Risks: handoff가 불완전하면 Luna가 잘못된 범위를 구현하거나 결정이 반복 왕복될 수 있다. project config는 이미 시작된 session에 소급 적용되지 않을 수 있다.
 - Verification: TOML parsing, strict project config, local model catalog의 slug/effort, 새 session의 custom role discovery와 실제 spawn metadata를 순서대로 확인한다.
 - Human confirmation: 2026-08-05 구현·구체화는 Luna medium, 책임·결정·기획은 Sol high로 분리하라는 사용자 요청.
+
+## ADR-008: Terra-main·Luna·Sol multi-stage routing과 commit-scope gate
+
+- Status: `ACCEPTED`
+- Requirement ID: `R-003`
+- Context: v1.1 two-role routing은 일반 구현 ownership과 independent approval, HIGH/repeated-failure escalation을 충분히 구분하지 못했다.
+- Decision: Terra-main (`gpt-5.6-terra` / `max`)이 `LOW/MEDIUM` contract와 일반 production/test/focused verification/final regression의 single write owner다. Luna (`gpt-5.6-luna` / `max`, supported surface `fast`)는 닫힌 stage 또는 independent read-only verification만 맡고, `sol_approver` (`gpt-5.6-sol` / `medium`)는 read-only final approval, `sol_high` (`gpt-5.6-sol` / `high`)는 defined HIGH/repeated-failure diagnosis·contract만 맡는다. staged diff는 `600` non-generated text changed lines 또는 `12` non-generated text files에서 review stop을 낸다.
+- Why: 구현 책임은 한 곳에 두면서 좁은 병렬·review 역할과 escalation 증거를 명시하기 위해서다.
+- Alternatives: v1.1 two-role routing을 유지하거나 하나의 Sol role이 모든 작업을 수행한다.
+- Why excluded: 전자는 approval/escalation 경계가 부족하고, 후자는 닫힌 반복 작업과 독립 review의 비용·검증 이점을 잃는다.
+- Risks: named-role runtime discovery와 실제 product handoff 품질은 아직 검증되지 않았다.
+- Verification: shell/public/static/staged-scope checks, Luna re-review `PASS`, `sol_approver` final approval `APPROVED`; runtime discovery와 template product verification은 `NOT_RUN`이다.
+- Human confirmation: 2026-08-10 사용자가 v1.2 candidate를 명시적으로 승인했다.
 
 ## ADR template
 

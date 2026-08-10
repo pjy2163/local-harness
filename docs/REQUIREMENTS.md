@@ -15,7 +15,8 @@
 | ID | Requirement / expected outcome | Acceptance summary | Priority | Status | Depends on | Source | Updated | Notion |
 |---|---|---|---|---|---|---|---|---|
 | R-001 | 공통 하네스에 단순성 원칙, 기술 결정 mirror와 운영 경계 landing template을 제공한다 | 안전한 구현 기본값, 4개 Notion DB 계약, 재사용 landing 구조 | `NOW` | `DONE` | - | 사용자 요청 | 2026-08-05 | Decisions `미동기화` |
-| R-002 | 책임·기획·결정과 구현을 모델별 역할로 분리한다 | Sol/high owner, Luna/medium implementer, bounded handoff와 재검토 | `NOW` | `DONE` | R-001 | 사용자 요청 | 2026-08-05 | `미동기화` |
+| R-002 | 책임·기획·결정과 구현을 모델별 역할로 분리한다 | v1.1 two-role contract; `R-003`에서 superseded | `NOW` | `DONE` | R-001 | 사용자 요청 | 2026-08-10 | `미동기화` |
+| R-003 | Terra-main·Luna·Sol multi-stage routing과 commit-scope gate를 제공한다 | fixed roles, single writer, focused-first review와 `600` text lines / `12` text files review stop | `NOW` | `DONE` | R-002 | 2026-08-10 사용자 승인 | 2026-08-10 | `미동기화` |
 
 ## Requirement details
 
@@ -37,6 +38,8 @@
 
 ### R-002 — Sol owner / Luna implementer 역할 분리
 
+- Historical status: `DONE`; 2026-08-10에 `R-003`으로 superseded. 아래 detail은 v1.1 기록으로 보존한다.
+
 - User/problem: 구현 소음이 책임·결정·기획 맥락과 섞이지 않으면서도 역할별 비용과 추론 깊이를 제어하고 싶다.
 - Expected outcome: primary Sol/high가 문제·책임·기획·중요한 결정과 최종 acceptance를 소유하고, 승인된 구현·구체화만 Luna/medium custom agent가 수행한다.
 - In scope: project model defaults, custom implementer agent, bounded handoff·escalation contract, harness routing과 검증.
@@ -50,6 +53,21 @@
 - Dependencies: trusted project와 custom subagent를 지원하는 새 Codex session. model/account availability는 runtime에 따라 달라질 수 있다.
 - Source: 2026-08-05 사용자 요청. 모델·custom agent 설정 형식은 2026-08-05 조회한 공식 Codex manual의 Subagents / Config 문서.
 - Human confirmation: 구현·구체화는 Luna medium, 책임·결정·기획은 Sol high로 분리하라는 명시적 요청.
+
+### R-003 — Terra-main·Luna·Sol multi-stage routing과 commit-scope gate
+
+- User/problem: 일반 구현의 write ownership, 닫힌 작업과 technical approval의 경계를 일관되게 유지하면서 reviewable commit 범위를 강제해야 한다.
+- Expected outcome: Terra-main이 `LOW/MEDIUM` single write owner가 되고, Luna·`sol_approver`·`sol_high`가 제한된 handoff만 수행하며 staged review-stop gate가 적용된다.
+- In scope: common role/config/skill guidance, named agent configs, active flow/state, `scripts/check-commit-scope.sh`와 관련 README/PROMPTS.
+- Out of scope: product-specific verification, role runtime discovery, `docs/DESIGN.md`, Notion schema·external sync, deployment.
+- Acceptance criteria:
+  - [x] Terra-main, Luna, `sol_approver`, `sol_high`의 model/effort·write/read-only·escalation 경계가 일치한다.
+  - [x] focused-first verification, final full regression once, two complete failure-cycle escalation과 human acceptance flow가 문서화된다.
+  - [x] staged gate가 `600` non-generated text changed lines 또는 `12` non-generated text files에서 review stop을 낸다.
+  - [x] local static checks와 independent Luna re-review, `sol_approver` approval 및 human acceptance가 기록된다.
+- Dependencies: named-role runtime discovery와 product verification은 적용 프로젝트의 trusted session/manifest가 필요하다.
+- Source: 2026-08-10 사용자 요청과 v1.2 candidate의 explicit approval.
+- Human confirmation: 2026-08-10 사용자가 v1.2 candidate를 명시적으로 승인했다.
 
 ## Requirement detail template
 
