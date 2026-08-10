@@ -139,6 +139,10 @@ label을 placeholder로 대체하지 않는다. 입력 오류는 필드 가까�
 
 아이콘은 단순한 line 또는 restrained filled style 중 프로젝트에서 하나를 고른다. stock photo와 무관한 장식 이미지를 기본으로 넣지 않는다. 실제 제품 화면, 데이터와 사용 맥락이 우선이다.
 
+- 아이콘은 하나의 일관된 스타일과 시스템을 사용하고, 색은 공통 token을 상속한다(`currentColor` 등).
+- 임의로 서로 다른 icon family를 섞지 않으며, 장식 아이콘은 assistive technology에서 숨긴다.
+- icon-only control에는 accessible name을 제공하고, 핵심 action이나 상태를 emoji로 표현하지 않는다.
+
 ## 8. Required UI states
 
 모든 주요 흐름에서 다음 상태를 설계한다.
@@ -205,6 +209,14 @@ Marketing·service landing page는 visual token만 공통화하지 않고 `docs/
 - 지원/비지원 범위, 자동화/사람 책임, 데이터와 실패 동작을 숨겨진 약관이 아니라 신뢰 정보로 다룬다.
 - 운영 경계는 긴 경고문 대신 scan 가능한 표, 짧은 문장과 관련 FAQ로 나눈다.
 - 계획, mock, beta와 실제 제공 상태를 시각적으로 구분한다.
+- demo/test data는 실제 product data와 구분되는 label을 붙여 보여준다.
+- 검증되지 않은 customer logo, ranking, metric과 security badge를 claim으로 사용하지 않는다.
+- contact form은 submitting, success, duplicate와 error 상태를 보여주며, backend가 unavailable이면 성공한 것처럼 표시하지 않는다.
+
+### Component responsibility and reuse
+
+- page는 section 순서, copy와 data composition을 담당하고, reusable component는 semantic interaction·accessible focus/state·responsive contract를 소유한다.
+- trivial single-use wrapper는 추상화하지 않고, 실제 variation이 반복될 때만 명시적이고 안정적인 variant를 추가한다.
 
 ## 14. Visual review checklist
 
