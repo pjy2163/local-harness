@@ -4,12 +4,35 @@
 
 ## Current verification summary
 
-- Last verified at: `2026-08-10` (accepted v1.2 baseline)
-- Revision or working tree: `codex/harness-common-v1-2 + working tree`
-- Overall: `PASS` for v1.2 static contract, public boundary, scope-gate and independent technical approval
-- Unverified claims: named-role runtime discovery, template product verification, actual feature handoff quality·latency, Notion external schema/write
+- Last verified at: `2026-08-29`
+- Revision or working tree: `local common/web v1.3 candidate branches`
+- Current static/config/public/role-drift checks: `PASS`
+- Explicit focused/release hook behavior: expected `NOT_RUN` / exit `2` because this template has no project or release hook
+- Unverified claims: remote GitHub branch update, named-role runtime discovery, web browser/render behavior, Notion external schema/write, Sol technical review and human acceptance
 
-## Execution log
+## v1.3 candidate execution log
+
+| Time | Boundary | Command / input | Actual | Status |
+|---|---|---|---|---|
+| 2026-08-29 | whitespace | `git diff --check` | exit 0 | `PASS` |
+| 2026-08-29 | shell syntax | `bash -n scripts/check-public.sh scripts/verify.sh scripts/check-commit-scope.sh` | exit 0 | `PASS` |
+| 2026-08-29 | shell syntax and onboarding hooks | `bash -n scripts/*.sh` | exit 0 | `PASS` |
+| 2026-08-29 | config syntax | `python3.11` TOML parse for `.codex/*.toml`; Ruby YAML parse for `openai.yaml` | all parsed | `PASS` |
+| 2026-08-29 | role/config contract | `bash scripts/check-role-contract.sh` | docs role rows and named configs agree | `PASS` |
+| 2026-08-29 | public boundary | `bash scripts/check-public.sh` | no common secret, personal home path or personal Notion pattern | `PASS` |
+| 2026-08-29 | focused hook | `bash scripts/verify.sh --focused` | missing `scripts/verify.project.sh`; exit 2 | `NOT_RUN` |
+| 2026-08-29 | release hook | `bash scripts/verify.sh --release` | missing `scripts/verify.release.sh`; exit 2 | `NOT_RUN` |
+| 2026-08-29 | invalid mode | `bash scripts/verify.sh --bad` | invalid mode; exit 2 | `NOT_RUN` |
+| 2026-08-29 | branch integration | `git merge-base --is-ancestor main web`; `git diff --name-status main..web` | common refs point to the same local v1.3 candidate; web is a descendant and differs only in `docs/DESIGN.md`, `docs/LANDING.md` | `PASS` |
+
+No product tests, browser tests, external Notion writes, broad regression or runtime role discovery were run for this template candidate.
+
+The user-selected `gpt-5.6-sol / medium` setting is task provenance for this
+maintenance request. It does not change the reusable v1.3 default role map;
+the requested setting and its execution result must be kept separate from the
+repository's `luna_max` implementation-owner contract.
+
+## Historical execution log (v1.2 and earlier)
 
 | Time | User flow or boundary | Command / input | Expected | Actual | Status |
 |---|---|---|---|---|---|

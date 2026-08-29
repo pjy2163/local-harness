@@ -1,6 +1,6 @@
-# Common Landing Page Template
+# Web Landing Page Template
 
-프로젝트 랜딩을 만들 때 공통 정보 구조와 운영 경계를 유지하기 위한 템플릿이다. 특정 브랜드나 en:ground의 화면을 복제하지 않고, 약속→작동 방식→증거→운영 경계→행동의 신뢰 흐름만 재사용한다. 대괄호 값은 실제 프로젝트 사실로 교체하고, 확인하지 못한 내용은 `미확인` 또는 `계획`으로 표시한다.
+이 문서는 `web` branch의 landing 프로젝트에만 적용되는 content contract다. common branch는 landing narrative나 CTA를 강제하지 않는다. 특정 브랜드나 en:ground의 화면을 복제하지 않고, 약속→작동 방식→증거→운영 경계→행동의 신뢰 흐름만 재사용한다. 대괄호 값은 실제 프로젝트 사실로 교체하고, 확인하지 못한 내용은 `미확인` 또는 `계획`으로 표시한다.
 
 ## Landing brief
 

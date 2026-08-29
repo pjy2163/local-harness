@@ -1,6 +1,8 @@
-# Common Design Direction
+# Web Design Direction
 
-프로젝트마다 브랜드와 세부 컴포넌트는 달라질 수 있지만, 별도 지시가 없으면 이 문서를 시각적 기본값으로 사용한다. 목표는 하얀 화면 위에 정보가 조용하고 정확하게 놓이는, 세련되고 가벼운 제품 디자인이다.
+이 문서는 `web` branch에만 적용되는 visual baseline이다. common branch는 특정 색상, 폰트, density, component library 또는 browser tool을 강제하지 않으며, 이 문서를 common에 복사하지 않는다. 프로젝트마다 브랜드와 세부 컴포넌트는 달라질 수 있다.
+
+목표는 하얀 화면 위에 정보가 조용하고 정확하게 놓이는, 세련되고 가벼운 제품 디자인이다.
 
 ## 1. Design character
 
@@ -14,9 +16,9 @@
 - 화면은 넉넉하게 호흡하되 컨트롤 자체는 간결하고 효율적으로 만든다.
 - 베이지, 크림, 아이보리, 황갈색 등 따뜻한 중성색은 사용하지 않는다.
 
-## 2. Fixed baseline and project overrides
+## 2. Web baseline and project overrides
 
-### Common baseline
+### Web baseline
 
 - 흰색 중심의 light theme
 - cool-neutral text, border와 surface
@@ -196,13 +198,13 @@ Density: comfortable | compact
 Core screens/components:
 Imagery/icon direction:
 Accessibility constraints:
-Intentional deviations from common baseline:
+Intentional deviations from this web baseline:
 Visual verification method:
 ```
 
-## 13. Landing page baseline
+## 13. Web landing page baseline
 
-Marketing·service landing page는 visual token만 공통화하지 않고 `docs/LANDING.md`의 정보 구조와 운영 경계 contract를 함께 사용한다. 프로젝트마다 핵심 약속과 실제 증거는 달라지지만 다음 원칙은 유지한다.
+Marketing·service landing page는 web visual token만으로 끝내지 않고 `docs/LANDING.md`의 정보 구조와 운영 경계 contract를 함께 사용한다. 프로젝트마다 핵심 약속과 실제 증거는 달라지지만 다음 원칙은 유지한다.
 
 - 한 명의 primary user, 하나의 핵심 문제와 하나의 primary CTA를 첫 화면에서 분명히 한다.
 - 제품이 실제로 작동하는 흐름과 증거를 추상적인 slogan보다 먼저 보여준다.

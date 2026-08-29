@@ -8,12 +8,13 @@
 |---|---|---|---|
 | ADR-001 | 하나의 적응형 루프와 동적 상태를 사용한다 | `ACCEPTED` | template baseline |
 | ADR-002 | Notion은 로컬 원장의 수동 mirror로 시작한다 | `ACCEPTED` | template baseline |
-| ADR-003 | 공통 UI는 white/cool-neutral baseline에서 시작한다 | `ACCEPTED` | template baseline |
+| ADR-003 | 초기 공통 UI는 white/cool-neutral baseline에서 시작한다 | `SUPERSEDED` | template history |
 | ADR-004 | 단순한 working layer와 명시적인 호환성 경계를 기본으로 한다 | `ACCEPTED` | 2026-08-05 |
 | ADR-005 | 기술 결정을 네 번째 Notion mirror database로 둔다 | `ACCEPTED` | 2026-08-05 |
-| ADR-006 | landing에 운영 경계를 포함한 공통 content contract를 사용한다 | `ACCEPTED` | 2026-08-05 |
+| ADR-006 | web overlay landing에 운영 경계를 포함한 content contract를 사용한다 | `ACCEPTED` | 2026-08-05 |
 | ADR-007 | Sol owner와 Luna implementer로 책임과 실행을 분리한다 | `SUPERSEDED` | 2026-08-05 |
-| ADR-008 | Terra-main·Luna·Sol multi-stage routing과 commit-scope gate를 사용한다 | `ACCEPTED` | 2026-08-10 |
+| ADR-008 | Terra-main·Luna·Sol multi-stage routing과 commit-scope gate를 사용한다 | `SUPERSEDED` | 2026-08-10 |
+| ADR-009 | v1.3 common policy와 선택적 web overlay를 사용한다 | `PROPOSED` | 2026-08-29 |
 
 ## ADR-001: 고정 단계 대신 적응형 프로젝트 루프
 
@@ -39,9 +40,10 @@
 - Verification: 프로젝트마다 preview, schema read-back, write/read-back과 같은 키 재실행으로 확인한다.
 - Human confirmation: Notion은 사람이 확인하는 기록으로 사용하고, 구현 범위와 외부 쓰기는 사람이 결정한다.
 
-## ADR-003: White/cool-neutral 공통 디자인 baseline
+## ADR-003: White/cool-neutral 초기 디자인 baseline
 
-- Status: `ACCEPTED`
+- Status: `SUPERSEDED`
+- Superseded for the common branch by ADR-009; retained as a possible web-overlay reference.
 - Context: 프로젝트마다 세부 디자인은 달라지지만 세련되고 깔끔한 공통 출발점이 필요하다.
 - Decision: pure white 중심, cool gray 계층, 넉넉한 자간, 낮은 elevation과 제한된 accent를 공통 baseline으로 사용한다. beige·cream 계열은 제외하고 프로젝트별 brand 선택은 override한다.
 - Why: AI가 매 프로젝트에서 임의의 스타일을 새로 만들지 않으면서도 브랜드별 유연성을 유지하기 위해서다.
@@ -77,7 +79,7 @@
 - Verification: schema 비교, `Decision ID` upsert, write/read-back과 같은 키 재실행으로 중복과 상태를 확인한다.
 - Human confirmation: 2026-08-05 Notion page 생성 시 기술 결정 database를 추가해 달라는 사용자 요청.
 
-## ADR-006: 운영 경계를 포함한 공통 landing content contract
+## ADR-006: 운영 경계를 포함한 web overlay landing content contract
 
 - Status: `ACCEPTED`
 - Requirement ID: `R-001`
@@ -89,6 +91,8 @@
 - Risks: 모든 행을 기계적으로 노출하면 작은 landing이 무거워질 수 있다.
 - Verification: 해당 없는 항목은 제거하되 중요한 미확인은 표시하고, 실제 flow/evidence와 content를 대조한 뒤 mobile·desktop·keyboard로 렌더링을 확인한다.
 - Human confirmation: 2026-08-05 en:ground처럼 운영 경계 등을 공통화할 landing template 요청.
+
+이 결정의 현재 적용 범위는 `web` branch overlay다. Common branch는 특정 visual 또는 landing baseline을 강제하지 않는다.
 
 ## ADR-007: Sol owner와 Luna implementer 역할 분리
 
@@ -106,7 +110,7 @@
 
 ## ADR-008: Terra-main·Luna·Sol multi-stage routing과 commit-scope gate
 
-- Status: `ACCEPTED`
+- Status: `SUPERSEDED`
 - Requirement ID: `R-003`
 - Context: v1.1 two-role routing은 일반 구현 ownership과 independent approval, HIGH/repeated-failure escalation을 충분히 구분하지 못했다.
 - Decision: Terra-main (`gpt-5.6-terra` / `max`)이 `LOW/MEDIUM` contract와 일반 production/test/focused verification/final regression의 single write owner다. Luna (`gpt-5.6-luna` / `max`, supported surface `fast`)는 닫힌 stage 또는 independent read-only verification만 맡고, `sol_approver` (`gpt-5.6-sol` / `medium`)는 read-only final approval, `sol_high` (`gpt-5.6-sol` / `high`)는 defined HIGH/repeated-failure diagnosis·contract만 맡는다. staged diff는 `600` non-generated text changed lines 또는 `12` non-generated text files에서 review stop을 낸다.
@@ -116,6 +120,20 @@
 - Risks: named-role runtime discovery와 실제 product handoff 품질은 아직 검증되지 않았다.
 - Verification: shell/public/static/staged-scope checks, Luna re-review `PASS`, `sol_approver` final approval `APPROVED`; runtime discovery와 template product verification은 `NOT_RUN`이다.
 - Human confirmation: 2026-08-10 사용자가 v1.2 candidate를 명시적으로 승인했다.
+- Superseded by ADR-009 for the v1.3 active contract; retained as v1.2 provenance.
+
+## ADR-009: v1.3 common policy와 선택적 web overlay
+
+- Status: `PROPOSED`
+- Requirement ID: `R-004`
+- Context: v1.2 템플릿은 Terra-main active routing, 고정된 multi-stage 흐름, manifest 자동 검증과 common visual/landing 문서를 한 저장소에 묶었다. 실제 프로젝트 사용에서는 작은 변경에도 planner·approver·full suite가 반복되고, 제품별 문서와 공통 정책이 섞이며, 실행하지 않은 검증을 성공처럼 해석할 위험이 있었다.
+- Decision: common branch는 사람이 확정한 closed contract의 implementation/test/focused evidence를 한 implementation owner가 소유한다. planner·technical approver·HIGH/repeated-failure diagnosis는 조건부 read-only 역할로 둔다. `verify.sh`는 `--focused`와 `--release` hook만 명시적으로 실행한다. visual, landing, browser 기준은 `web` branch overlay로 이동하고 Notion schema/procedure는 optional example 문서 한 곳에 둔다. usage ratio와 자동 model/effort fallback은 기록하지 않는다.
+- Why: 가장 작은 working flow와 실제 evidence에 집중하면서도 사람의 업무 규칙·외부 write·중요한 위험 결정을 보존하고, common template가 제품에 과적합되지 않게 하기 위해서다.
+- Alternatives: v1.2 multi-stage를 유지하거나 모든 project stack을 `verify.sh`가 자동 탐지하게 둔다.
+- Why excluded: 역할 강제와 broad 자동 실행이 작은 작업의 latency·중복·검증 의미를 악화시키며, stack 자동 탐지는 프로젝트별 명령과 실패 경계를 숨긴다.
+- Risks: 사람이 focused hook과 release gate를 올바르게 정의해야 하며, web overlay 선택을 누락하면 UI 검증이 약해질 수 있다.
+- Verification: role/config syntax, explicit hook behavior, public/scope checks, common/web tree comparison과 README migration review. 실제 project runtime·browser·Notion write는 프로젝트에서 별도로 검증한다.
+- Human confirmation: `PENDING` — v1.3 candidate review packet 뒤 사람이 승인한다.
 
 ## ADR template
 

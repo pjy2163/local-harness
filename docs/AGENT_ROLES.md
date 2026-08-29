@@ -1,48 +1,131 @@
-# Agent Role and Model Routing
+# Agent Role and Model Routing (v1.3)
 
-v1.2는 기존의 두 역할 위임 모델을 교체한다. Terra-main이 일반 구현의 단일 write owner이고, Luna와 Sol은 계약상 제한된 stage만 맡는다.
+This file is the exact source of truth for agent `role`, `model`, `effort`,
+`sandbox`, ownership, and invocation conditions. Runtime configuration under
+`.codex/` must conform to this contract; it does not create an alternate
+ownership or fallback rule.
+
+## Fixed contract
+
+- Human decision owners choose the user problem, priority, approved scope,
+  Source of Truth, business rules, compatibility boundaries, architecture,
+  security, authorization, money, concurrency, and deployment decisions.
+- `luna_max` implements a closed `LOW/MEDIUM` contract inside those decisions.
+  It is the sole write owner for production code, tests, focused verification,
+  fixes, and the documentation sync required by that contract.
+- A worktree has one write owner at a time. Agents must not write concurrently
+  in the same worktree.
+- No automatic model or effort fallback is allowed. If the requested role or
+  exact setting is unavailable, record `NOT_RUN` and return the decision.
+- Do not estimate or report usage ratios. Do not force planner, approver, or
+  full-regression stages for work whose conditions do not call for them.
+- A new business, domain, security, authorization, money, concurrency, or
+  compatibility decision returns to the human decision owner or the
+  appropriate Sol role; it is not invented inside implementation.
+
+## Per-task model selection
+
+A human may explicitly select a model and effort for one maintenance task. The
+requested and actual setting, result, and any limitation belong in
+`docs/EVIDENCE.md`; they do not silently rewrite this reusable role map. For
+the v1.3 maintenance request, `gpt-5.6-sol / medium` was the requested task
+model. The default v1.3 contract remains `luna_max` as the implementation/test
+owner, with Sol roles read-only and conditional.
 
 ## Role map
 
-| Role | Configuration | Responsibility | Never does |
-|---|---|---|---|
-| Terra-main | project default `gpt-5.6-terra`, `max` | `LOW/MEDIUM` contract·handoff 조율, production/test/focused verification/fix/final regression | 새 인간 소유 rule·security·compatibility 결정을 임의 확정 |
-| Luna | `luna_max`, `gpt-5.6-luna`, `max`, `fast` where supported | 닫힌 matrix·반복 assertion·좁은 stage 또는 독립 read-only verification | Terra-main과 같은 worktree에서 병렬 write, 열린 판단 |
-| `sol_approver` | `gpt-5.6-sol`, `medium`, read-only | final evidence·contract·Luna findings 기반 `LOW/MEDIUM` approval | product/config/test write 또는 broad rerun |
-| `sol_high` | `gpt-5.6-sol`, `high` | `HIGH` 판단 또는 두 fix→affected-test cycle 뒤 root-cause diagnosis/contract | 구현 또는 broad regression |
+| Role | Model / effort | Sandbox | Ownership and output | Invoke only when |
+|---|---|---|---|---|
+| `luna_max` | `gpt-5.6-luna` / `max` / `fast` | `workspace-write` | Sole write owner for a closed `LOW/MEDIUM` contract: production code, tests, focused verification, fixes, and required documentation sync. | Existing human decisions close the rules and scope. |
+| `sol_planner` | `gpt-5.6-sol` / `max` | `read-only` | Returns only outcome, in/out of scope, acceptance, risk, focused verification, and human decisions needed. | A new feature or unclear scope needs a bounded contract. |
+| `sol_approver` | `gpt-5.6-sol` / `medium` | `read-only` | Performs only the configured gate or necessary technical approval after `LOW/MEDIUM` evidence. Returns read-only findings. | Final evidence exists and the configured/needed approval condition applies. |
+| `sol_high` | `gpt-5.6-sol` / `xhigh` | `read-only` | Returns diagnosis and a bounded contract only; it does not implement or test. | A `HIGH`-risk judgment is required, or the same failure remains after two complete `fix → affected-test rerun` cycles. |
 
-프로젝트 default는 [`.codex/config.toml`](../.codex/config.toml), named role 설정은 [`.codex/agents/`](../.codex/agents/)에 둔다. trusted project의 새 session에서 적용한다.
+All Sol roles are read-only: they do not modify or execute production code,
+tests, migrations, configuration, or documentation. Sol does not replace the
+human decision owner, and Luna does not approve a new human-owned rule.
 
-## Workflow
+## Human and Luna boundary
+
+The human decision owner owns:
+
+- the problem, priority, acceptance intent, and approved in/out of scope;
+- business/domain rules and the Source of Truth;
+- compatibility, architecture, security, authorization, money, concurrency,
+  and irreversible external-state decisions; and
+- whether an unresolved decision is accepted, changed, or deferred.
+
+Within a closed contract, `luna_max` owns:
+
+- the task contract wording and repeatable success/failure preflight matrix;
+- the smallest vertical implementation and its production tests;
+- focused verification, failure isolation, minimum fixes, and reruns; and
+- the evidence and required documentation sync for the approved unit.
+
+Luna must stop at a missing decision, unclear boundary, environment/permission
+decision, or new protected rule and return evidence without expanding scope.
+
+## Routing and handoff
 
 ```text
-Human request
-  → Terra-main: LOW/MEDIUM task contract와 single writer 지정
-  → Luna: 적용 시 닫힌 stage 또는 독립 read-only verification
-  → sol_approver: evidence-based, read-only final approval
-  → Terra-main: review packet
-  → Human: acceptance
+Human-approved closed LOW/MEDIUM contract
+  → luna_max: contract, preflight, implementation, focused verification, fix
+  → sol_approver: only when configured or technically required
+  → Luna review packet → human acceptance
+
+New feature or unclear scope
+  → sol_planner: read-only contract
+  → human decision owner closes the decisions
+  → luna_max: implementation and verification
+
+HIGH-risk judgment or repeated failure
+  → sol_high: read-only diagnosis/contract
+  → human/Sol decision closes the boundary
+  → luna_max: implementation and verification
 ```
 
+The planner is not mandatory for a closed contract. The approver is not
+mandatory for every task. Human acceptance is not replaced by either role.
+
 ## Task contract
+
+Every Luna write unit stays inside this bounded contract:
 
 ```text
 Outcome:
 In scope / out of scope:
-Fixed rules and acceptance:
+Fixed human decisions and rules:
+Acceptance:
 Affected boundaries and risk:
+Repeatable success preflight:
+Repeatable failure/boundary preflight:
 Focused verification command:
 Escalation condition:
 ```
 
-- `HIGH` 위험 또는 새 business, architecture, security, authorization, money, concurrency, compatibility 결정은 구현 전에 `sol_high` 또는 사람에게 올린다.
-- 같은 worktree에는 한 write owner만 둔다. Luna가 write stage를 맡으면 명시적으로 그 stage의 sole owner가 되고 Terra-main과 병렬로 쓰지 않는다.
-- focused verification을 먼저 실행한다. final candidate의 full regression은 한 번만 실행하고, 후보가 바뀐 경우에만 affected check와 full regression을 다시 실행한다.
-- 최초 failure 재현은 retry가 아니다. 같은 failure가 두 complete `fix → affected-test rerun` cycle 뒤에도 남으면 `sol_high`에 failure evidence, attempted delta와 narrowest unresolved boundary를 반환한다.
+Focused verification covers the changed boundary and its meaningful failure
+case. Full regression is run only when an explicit gate, shared boundary,
+regression finding, or human request requires it; it is never a default stage.
 
-## Approval and runtime
+The repository-level role/config consistency check is
+`bash scripts/check-role-contract.sh`. It is a static drift detector, not a
+runtime role-discovery or permission proof.
 
-- `LOW/MEDIUM` final approval은 Terra-main contract·self-verification·final evidence와 적용 가능한 Luna findings를 `sol_approver`가 read-only로 검토해 만든다. finding은 `BLOCKER | MUST | SHOULD | LEARNING`으로 돌려준다.
-- final order는 `Terra-main → Luna (적용 시) → sol_approver → review packet → human acceptance`다. 승인 전에는 `ACTIVE`, 승인 뒤에만 evidence·worklog·optional mirror를 batch sync한다.
-- requested model이 surface에 없으면 더 높은 capability tier로만 대체하고 handoff에 기록한다. `sol_high` 역할은 자동 하향하지 않는다.
-- staging gate는 `git diff --cached --check`, `bash scripts/check-commit-scope.sh --staged`, `git diff --cached --stat`, `git diff --cached`다. `600` non-generated text changed lines 또는 `12` non-generated text files는 bypassable normal path가 아닌 review stop이다.
+## Failure and escalation
+
+- The first failure reproduction is evidence, not a retry.
+- After each complete `fix → affected-test rerun` cycle, Luna keeps the delta
+  inside the contract and records the result.
+- If the same failure survives two complete cycles, Luna does not widen the
+  patch. It sends the failure evidence, attempted deltas, and narrowest
+  unresolved boundary to `sol_high`.
+- `sol_high` returns diagnosis/contract only; Luna remains the implementation
+  and test owner after the boundary is decided.
+- Sol findings are classified as `BLOCKER`, `MUST`, `SHOULD`, or `LEARNING`.
+
+## Superseded history
+
+Earlier v1.2 material described Terra-main as the active default write owner
+and used older routing details. That history is retained only as provenance;
+it is superseded and is not an active role, model, or ownership rule. The v1.3
+contract above is authoritative.

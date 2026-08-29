@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Harness"
-  short_description: "Terra-main·Luna·명시적 Sol 역할을 연결합니다"
-  default_prompt: "Use $project-harness with Terra-main (gpt-5.6-terra max) as coordinator and implementation owner, Luna (gpt-5.6-luna max/fast) for closed stages and independent verification, sol_approver for read-only final approval, and sol_high only for defined HIGH or repeated-failure escalation."
+  short_description: "Luna-main 구현·검증과 필요 시 Sol review를 연결합니다"
+  default_prompt: "Use $project-harness with Luna-main as the sole implementation/test owner for closed LOW/MEDIUM contracts. Escalate only when needed: sol_planner for new or uncertain scope, sol_approver for evidence-based LOW/MEDIUM technical approval, and sol_high for HIGH risk or repeated failures."
