@@ -14,7 +14,7 @@
 | ADR-006 | web overlay landing에 운영 경계를 포함한 content contract를 사용한다 | `ACCEPTED` | 2026-08-05 |
 | ADR-007 | Sol owner와 Luna implementer로 책임과 실행을 분리한다 | `SUPERSEDED` | 2026-08-05 |
 | ADR-008 | Terra-main·Luna·Sol multi-stage routing과 commit-scope gate를 사용한다 | `SUPERSEDED` | 2026-08-10 |
-| ADR-009 | v1.3 common policy와 선택적 web overlay를 사용한다 | `PROPOSED` | 2026-08-29 |
+| ADR-009 | v1.3 common policy와 선택적 web overlay를 사용한다 | `ACCEPTED` | 2026-08-29 |
 
 ## ADR-001: 고정 단계 대신 적응형 프로젝트 루프
 
@@ -124,7 +124,7 @@
 
 ## ADR-009: v1.3 common policy와 선택적 web overlay
 
-- Status: `PROPOSED`
+- Status: `ACCEPTED`
 - Requirement ID: `R-004`
 - Context: v1.2 템플릿은 Terra-main active routing, 고정된 multi-stage 흐름, manifest 자동 검증과 common visual/landing 문서를 한 저장소에 묶었다. 실제 프로젝트 사용에서는 작은 변경에도 planner·approver·full suite가 반복되고, 제품별 문서와 공통 정책이 섞이며, 실행하지 않은 검증을 성공처럼 해석할 위험이 있었다.
 - Decision: common branch는 사람이 확정한 closed contract의 implementation/test/focused evidence를 한 implementation owner가 소유한다. planner·technical approver·HIGH/repeated-failure diagnosis는 조건부 read-only 역할로 둔다. `verify.sh`는 `--focused`와 `--release` hook만 명시적으로 실행한다. visual, landing, browser 기준은 `web` branch overlay로 이동하고 Notion schema/procedure는 optional example 문서 한 곳에 둔다. usage ratio와 자동 model/effort fallback은 기록하지 않는다.
@@ -133,7 +133,7 @@
 - Why excluded: 역할 강제와 broad 자동 실행이 작은 작업의 latency·중복·검증 의미를 악화시키며, stack 자동 탐지는 프로젝트별 명령과 실패 경계를 숨긴다.
 - Risks: 사람이 focused hook과 release gate를 올바르게 정의해야 하며, web overlay 선택을 누락하면 UI 검증이 약해질 수 있다.
 - Verification: role/config syntax, explicit hook behavior, public/scope checks, common/web tree comparison과 README migration review. 실제 project runtime·browser·Notion write는 프로젝트에서 별도로 검증한다.
-- Human confirmation: `PENDING` — v1.3 candidate review packet 뒤 사람이 승인한다.
+- Human confirmation: `ACCEPTED` — 2026-08-29 사용자가 v1.3 candidate를 승인하고 개인정보 점검 후 non-force push를 요청했으며, push가 완료됐다.
 
 ## ADR template
 

@@ -18,7 +18,7 @@
 | R-001 | local Source of Truth와 적응형 project loop | 상태·요구사항·흐름·증거·사람 결정의 책임이 분리되고 가장 작은 E2E를 선택한다 | NOW | `DONE` / historical | v1.0 baseline |
 | R-002 | common engineering, Git/security와 reviewable unit | 실제 seam 없는 추상화·fallback·대형 diff를 억제하고 변경 경계를 검증한다 | NOW | `DONE` / historical | v1.1 baseline |
 | R-003 | v1.2 multi-role routing | Terra-main default, 제한된 Luna/Sol stage와 forced routing을 사용했던 이전 baseline | NEXT | `DONE` / superseded | v1.2; v1.3에서 superseded |
-| R-004 | v1.3 common/web harness와 README v1.3 | 아래 acceptance criteria와 migration이 모두 충족되고 사람 승인을 받는다 | NOW | `ACTIVE` | current candidate |
+| R-004 | v1.3 common/web harness와 README v1.3 | 아래 acceptance criteria와 migration이 모두 충족되고 사람 승인을 받는다 | NOW | `DONE` | accepted and pushed 2026-08-29 |
 
 ## R-004 — v1.3 common/web harness와 README v1.3
 
@@ -47,24 +47,23 @@
 
 ### Acceptance criteria
 
-- [ ] common three branches have the same v1.3 tree and `web` is a descendant that adds only its web overlay.
-- [ ] README v1.3 explains the problem, common/web choice, five-minute start, daily flow, file responsibilities, focused/release verification, optional Notion/roles and v1.2 migration.
-- [ ] common policy does not require a product-specific color palette, landing narrative, browser tool or TIEAT domain rule.
-- [ ] `docs/AGENT_ROLES.md` is the exact role/model/effort/sandbox source of truth; Luna is the normal implementation/test owner and Sol roles are conditional read-only roles.
-- [ ] `STATE`, `REQUIREMENTS`, `SYSTEM_MAP`, `EVIDENCE`, `WORKLOG` and `NOTION.local.example` have non-overlapping responsibilities.
-- [ ] `verify.sh` never infers a stack or silently runs a broad suite; absent hooks return `NOT_RUN` with exit `2`.
-- [ ] Notion schema/procedure is maintained in one optional example file and no actual ID is guessed.
-- [ ] generated build output and common local artifacts are ignored without hiding source files.
-- [ ] public-safety and commit-scope checks remain available, and no secret or personal path is introduced.
-- [ ] role/config drift check passes, and project/release hook examples preserve `NOT_RUN` until a project supplies real commands.
-- [ ] actual focused checks, technical review and human acceptance are recorded before this requirement becomes `DONE`.
+- [x] common three branches have the same v1.3 tree and `web` is a descendant that adds only its web overlay.
+- [x] README v1.3 explains the problem, common/web choice, five-minute start, daily flow, file responsibilities, focused/release verification, optional Notion/roles and v1.2 migration.
+- [x] common policy does not require a product-specific color palette, landing narrative, browser tool or TIEAT domain rule.
+- [x] `docs/AGENT_ROLES.md` is the exact role/model/effort/sandbox source of truth; Luna is the normal implementation/test owner and Sol roles are conditional read-only roles.
+- [x] `STATE`, `REQUIREMENTS`, `SYSTEM_MAP`, `EVIDENCE`, `WORKLOG` and `NOTION.local.example` have non-overlapping responsibilities.
+- [x] `verify.sh` never infers a stack or silently runs a broad suite; absent hooks return `NOT_RUN` with exit `2`.
+- [x] Notion schema/procedure is maintained in one optional example file and no actual ID is guessed.
+- [x] generated build output and common local artifacts are ignored without hiding source files.
+- [x] public-safety and commit-scope checks remain available, and no secret or personal path is introduced.
+- [x] role/config drift check passes, and project/release hook examples preserve `NOT_RUN` until a project supplies real commands.
+- [x] actual focused checks, technical review and human acceptance are recorded before this requirement becomes `DONE`.
 
-### Human decisions pending
+### Human decisions recorded
 
-- Confirm canonical branch pointer and whether `app` and `codex/harness-common-v1-2` should be fast-forward aliases of `main`.
-- Confirm that `web` should retain its full design/landing documents as overlay while common keeps only compatibility stubs.
-- Confirm whether a future project wants optional Notion and technical approval; neither is required by default.
-- Confirm the final candidate after evidence and read-only technical review before remote push.
+- `main`, `app` and `codex/harness-common-v1-2` are the same pushed v1.3 common tree; `web` retains full design/landing overlay documents as a descendant.
+- Notion and technical approval remain optional defaults for future projects.
+- The final v1.3 candidate was accepted and pushed after the privacy audit on 2026-08-29.
 
 ### Verification plan
 

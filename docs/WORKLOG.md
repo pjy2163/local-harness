@@ -16,6 +16,19 @@
 - Remaining:
 - Notion: `미동기화 | local page URL`
 
+### 2026-08-29 — v1.3 common/web harness 정리·privacy audit·push
+
+- Local Entry ID: `2026-08-29/harness-v1-3-common-web`
+- Requirement ID: `R-004`
+- User value: 공통 하네스 사용 시 불필요한 stack 추측·강제 role·Notion 의존성을 줄이고, 웹 프로젝트만 시각 기준을 선택할 수 있다.
+- What changed: Luna 단일 implementation/test owner와 조건부 Sol role, explicit verification hooks, role/config drift check, hook examples, optional Notion contract, common neutral stubs와 web full overlay를 v1.3으로 정리했다. common 세 branch를 같은 tree로 맞추고 web을 descendant로 push했다.
+- Flow / contract affected: user request → local state/contract → implementation owner → focused evidence → conditional Sol review → human acceptance → closure/push.
+- Verification: shell/TOML/YAML/public/role-drift checks `PASS`; focused/release absent hooks and examples are intentional `NOT_RUN` / exit `2`; common refs and web overlay structure `PASS`; pre-push privacy audit `PASS`; four branch non-force push `PASS`.
+- Model provenance: user-requested task model `gpt-5.6-sol / medium`; direct implementation runtime model/effort is `미확인`; `sol_approver` `gpt-5.6-sol / medium` read-only final approval `APPROVED`.
+- What I learned or can now explain: file-content scans do not cover Git author metadata, so push hygiene must inspect both candidate files and outgoing commit identities. Common policy and web UI guidance are separate extension boundaries.
+- Remaining: consuming project의 actual verification hooks, runtime role discovery, browser/render evidence와 optional Notion schema/read-back은 해당 프로젝트에서 별도 검증한다.
+- Notion: `미동기화 — NOT_CONNECTED`
+
 ### 2026-08-10 — v1.2 multi-stage routing과 commit-scope gate
 
 - Local Entry ID: `2026-08-10/harness-v1-2-routing`

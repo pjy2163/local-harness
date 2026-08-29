@@ -5,10 +5,10 @@
 ## Current verification summary
 
 - Last verified at: `2026-08-29`
-- Revision or working tree: `local common/web v1.3 candidate branches`
+- Revision or working tree: `local common/web v1.3 branches pushed`
 - Current static/config/public/role-drift checks: `PASS`
 - Explicit focused/release hook behavior: expected `NOT_RUN` / exit `2` because this template has no project or release hook
-- Unverified claims: remote GitHub branch update, named-role runtime discovery, web browser/render behavior, Notion external schema/write, Sol technical review and human acceptance
+- Unverified claims: named-role runtime discovery, web browser/render behavior for a consuming project, Notion external schema/write, product-specific tests and broad regression
 
 ## v1.3 candidate execution log
 
@@ -24,8 +24,12 @@
 | 2026-08-29 | release hook | `bash scripts/verify.sh --release` | missing `scripts/verify.release.sh`; exit 2 | `NOT_RUN` |
 | 2026-08-29 | invalid mode | `bash scripts/verify.sh --bad` | invalid mode; exit 2 | `NOT_RUN` |
 | 2026-08-29 | branch integration | `git merge-base --is-ancestor main web`; `git diff --name-status main..web` | common refs point to the same local v1.3 candidate; web is a descendant and differs only in `docs/DESIGN.md`, `docs/LANDING.md` | `PASS` |
+| 2026-08-29 | technical approval | `sol_approver` (`gpt-5.6-sol` / `medium`, read-only) | final evidence reviewed; no `BLOCKER`/`MUST`; follow-up service-tier hardening approved | `PASS` |
+| 2026-08-29 | pre-push privacy | `bash scripts/check-public.sh`; sensitive filename, credential, home-path, Notion-link and email-pattern scans; outgoing commit metadata review | no candidate-file matches; unpublished personal commit metadata was removed before push; outgoing identities are non-personal | `PASS` |
+| 2026-08-29 | remote preflight | `git ls-remote --heads origin main app codex/harness-common-v1-2 web` | remote refs unchanged from fetched bases | `PASS` |
+| 2026-08-29 | remote delivery | `git push origin main app codex/harness-common-v1-2 web` | all four branches updated non-force: common from v1.2 base to v1.3, web from v1.2 web base to v1.3 overlay | `PASS` |
 
-No product tests, browser tests, external Notion writes, broad regression or runtime role discovery were run for this template candidate.
+No product tests, browser tests for a consuming project, external Notion writes, broad regression or runtime role discovery were run for this template candidate.
 
 The user-selected `gpt-5.6-sol / medium` setting is task provenance for this
 maintenance request. It does not change the reusable v1.3 default role map;

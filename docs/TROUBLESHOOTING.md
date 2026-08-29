@@ -33,3 +33,18 @@
 - Prevention / detection: inherited MCP를 custom agent에서 끌 때도 유효한 server transport contract를 완성하고, 문법 검사만이 아니라 실제 role loader/spawn을 실행한다.
 - Related flow or contract: `docs/AGENT_ROLES.md`, `.codex/agents/implementer.toml`, Sol owner → Luna implementer handoff.
 - Notion: `미동기화`
+
+### Push 직전 미푸시 commit metadata에 개인 identity가 포함됨
+
+- Incident ID: `TS-20260829-push-commit-metadata`
+- Requirement ID: `R-004`
+- Status: `RESOLVED`
+- Context: 파일 내용의 public safety 검사는 통과했지만, 아직 원격에 없는 outgoing commit metadata에는 local Git 사용자의 identity가 있었다.
+- Reproduction: `git log origin/main..main --format='%an <%ae>'`와 web outgoing range를 push 전에 확인한다.
+- Observed error: candidate file scan만으로는 Git author/committer metadata를 발견하지 못한다.
+- Root cause: repository-local Git identity가 개인 계정 값으로 설정돼 있었다.
+- Fix: local non-personal identity를 설정하고, 기존 원격 commit을 부모로 유지한 safe tree commit으로 미푸시 common/web history를 재구성했다. remote history rewrite나 force push는 하지 않았다.
+- Verification: outgoing metadata가 non-personal identity로만 남고, `check-public.sh`, sensitive filename/content scan, remote preflight와 four-branch non-force push가 `PASS`했다.
+- Prevention / detection: push 전 파일·untracked·ignored 경계뿐 아니라 outgoing commit author/committer metadata도 redacted identity 기준으로 검사한다.
+- Related flow or contract: `scripts/check-public.sh`, `docs/EVIDENCE.md`, common branch delivery.
+- Notion: `미동기화 — NOT_CONNECTED`
