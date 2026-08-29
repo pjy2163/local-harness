@@ -2,7 +2,7 @@
 
 AI가 코드를 만드는 데서 끝내지 않고, 사람이 사용자 흐름·데이터 출처·계약·실패 경로를 설명하고 소유하도록 돕는 경량 공통 템플릿이다.
 
-Current template version: **v1.2.0**
+Current template version: **v1.3.0**
 
 ## What it keeps connected
 
@@ -12,9 +12,9 @@ Current template version: **v1.2.0**
 - 데이터 출처, API contract와 mock/real 경계
 - 테스트가 보장하는 경계와 실제 실행 증거
 - 작업일지, 트러블슈팅과 포트폴리오 기록
-- white/cool-neutral 공통 디자인과 프로젝트별 override
-- 가치 제안·증거·운영 경계를 연결하는 공통 landing template
-- Terra-main, Luna, `sol_approver`, `sol_high`의 제한된 multi-stage contract
+- common workflow와 선택적인 web overlay의 경계
+- 명시적인 focused/release verification과 실제 evidence
+- Luna implementation owner와 조건부 Sol review contract
 - 선택적인 Notion 수동 mirror
 
 ## Structure
@@ -23,74 +23,105 @@ Current template version: **v1.2.0**
 AGENTS.md                    공통 작업·Git·보안·사람 소유 원칙
 .agents/skills/project-harness/
                              요청에 맞춰 다음 행동을 고르는 통합 스킬
-.codex/config.toml           Terra-main default와 프로젝트 전용 Notion MCP 설정
-.codex/agents/{luna-max,sol-approver,sol-high}.toml
-                             닫힌 Luna stage와 읽기 전용·HIGH Sol 역할
+.codex/config.toml           프로젝트 default와 선택적인 Notion MCP 설정
+.codex/agents/*.toml         named role의 ownership·model·sandbox 설정
 docs/STATE.md                AI가 유지하는 현재 상태
-docs/AGENT_ROLES.md          모델별 책임, handoff와 escalation contract
-docs/REQUIREMENTS.md         요구사항 원장과 Notion property contract
+docs/AGENT_ROLES.md          role별 책임, handoff와 escalation contract
+docs/REQUIREMENTS.md         안정적인 요구사항과 acceptance 원장
 docs/NOTION.local.example.md 개인 Notion 대상 설정 예시
-docs/DESIGN.md               공통 visual baseline
-docs/LANDING.md              공통 landing 정보 구조와 운영 경계
+docs/DESIGN.md               common stub / web branch full visual baseline
+docs/LANDING.md              common stub / web branch full landing contract
 docs/SYSTEM_MAP.md           활성 흐름, 데이터 계약과 테스트 지도
 docs/EVIDENCE.md             실제 명령과 결과
 docs/DECISIONS.md            사람이 확정한 ADR-lite
 docs/WORKLOG.md              작업일지
 docs/TROUBLESHOOTING.md      재사용할 문제 해결 기록
 docs/PORTFOLIO.md            포트폴리오 후보
-scripts/verify.sh            프로젝트 검증 진입점
+scripts/verify.sh            명시적인 focused/release 검증 진입점
+scripts/verify.*.example.sh  새 프로젝트용 hook 시작점
+scripts/check-role-contract.sh role 문서와 named config drift 검사
 scripts/check-public.sh      커밋 후보의 기본 공개 안전 검사
 scripts/check-commit-scope.sh staged diff의 review-stop 검사
 ```
 
-## Start a project
+## Choose common or web
 
-1. 기존 프로젝트의 규칙과 문서를 확인하고 파일을 덮어쓰기보다 병합한다.
-2. `docs/STATE.md`와 `docs/REQUIREMENTS.md`를 실제 프로젝트 사실로 초기화한다.
-3. trusted project에서 새 Codex session을 열어 `.codex/config.toml`과 named role configs를 로드한다.
-4. UI 작업이면 `docs/DESIGN.md`의 공통 기준에서 프로젝트별 선택만 override한다.
-5. landing 작업이면 `docs/LANDING.md`의 약속·작동 흐름·증거·운영 경계를 실제 사실로 초기화한다.
-6. 자동 탐지할 수 없는 검증 명령은 `scripts/verify.project.sh`에 둔다.
-7. 다음처럼 첫 요청을 시작한다.
+- `main`, `app`, `codex/harness-common-v1-2`는 공통 workflow·계약·검증 하네스다.
+- `web`은 공통 하네스 위에 디자인, landing, browser/screenshot guidance를 얹는 variant다. 공통 branch에는 특정 색상이나 제품 visual baseline을 강제하지 않는다.
+- 공통만 필요한 CLI/API/데이터 프로젝트는 common branch에서 시작한다. 화면·랜딩을 만드는 프로젝트만 `web` overlay를 선택한다.
+
+## Start in five minutes
+
+1. 현재 프로젝트의 `AGENTS.md`와 `docs/STATE.md`를 읽고 기존 파일과 병합한다.
+2. `docs/REQUIREMENTS.md`에 실제 문제·범위·acceptance를 기록하고 `docs/SYSTEM_MAP.md`에 사용자 흐름과 Source of Truth를 적는다.
+3. 프로젝트 hook이 필요하면 `scripts/verify.project.example.sh`를 `scripts/verify.project.sh`로 복사해 변경 경계에 맞는 명령으로 채운다. 명시적인 release gate가 있을 때만 release example과 `--release`를 사용한다.
+4. 필요하면 `docs/NOTION.local.example.md`를 복사해 실제 연결을 별도 local file로 설정한다.
+5. 아래 요청으로 첫 vertical slice를 시작한다.
 
 ```text
-$project-harness 현재 저장소와 내 요청을 기준으로 상태를 잡고,
-가장 작은 가치 있는 End-to-End 단위를 진행해줘.
-중요한 구현 범위와 업무 결정은 내가 선택할 수 있게 남겨줘.
+$project-harness 현재 상태와 내 요청을 기준으로 가장 작은
+가치 있는 End-to-End 단위를 정리하고, 필요한 contract와 focused
+검증만 진행해줘. 사람이 결정해야 할 범위는 남겨줘.
 ```
 
-Terra-main이 일반 구현과 final regression의 single write owner다. Luna는 닫힌 stage 또는 independent read-only verification만 맡고, `sol_approver`는 evidence-based final approval, `sol_high`는 정의된 HIGH/repeated-failure escalation만 맡는다. 완료 후 다음 요구사항을 자동으로 구현하지 않는다.
+## Daily flow
+
+`STATE → 관련 REQUIREMENTS/SYSTEM_MAP → task contract → implementation owner의 smallest slice → focused evidence → 필요한 Sol review → review packet → human acceptance` 순서로 진행한다. 완료한 요구사항 뒤의 다음 기능을 자동으로 시작하지 않는다.
+
+자세한 role·model·effort·sandbox 조건은 [`docs/AGENT_ROLES.md`](docs/AGENT_ROLES.md)에서 확인한다. closed contract의 구현·테스트·focused verification은 `luna_max`가 소유하고, planner·approver·HIGH diagnosis는 조건부다.
+
+사람이 특정 model/effort를 한 번의 유지보수 작업에 직접 지정할 수는 있지만, 이는 `docs/EVIDENCE.md`에 남기는 실행 provenance이며 재사용 템플릿의 기본 role ownership을 바꾸지 않는다. 이번 v1.3 작업의 요청 모델은 `gpt-5.6-sol / medium`으로 기록한다.
 
 ## Optional Notion mirror
 
-로컬 Markdown이 Source of Truth이고 Notion은 사람이 확인하는 수동 단방향 mirror다. 요구사항, 기술 결정, 작업일지와 트러블슈팅은 각각 `Requirement ID`, `Decision ID`, `Local Entry ID`, `Incident ID`를 안정 키로 사용한다.
+로컬 Markdown이 Source of Truth이고 Notion은 사람이 확인하는 수동 단방향 mirror다. `docs/NOTION.local.example.md`에 connection, stable key, property 예시와 sync 절차를 둔다.
 
-1. `docs/NOTION.local.example.md`를 `docs/NOTION.local.md`로 복사한다.
-2. 승인한 parent page와 Requirements, Decisions, Work Log, Troubleshooting 네 database의 실제 ID·property를 로컬 파일에 기록한다.
-3. 프로젝트를 trusted 상태로 연 뒤 `.codex/config.toml`의 Notion MCP에 OAuth로 로그인한다.
-4. 첫 sync는 preview → schema 확인 → write → read-back → 같은 키 재실행 순서로 검증한다.
+실제 연결이 필요할 때만 그 파일을 `docs/NOTION.local.md`로 복사하고 실제 대상·schema를 사람이 확인해 기록한다. 첫 sync는 preview → conflict/schema 확인 → write → read-back → 같은 key 재실행 순서다. ID·OAuth token·개인 연결 상태는 커밋하지 않는다.
 
-`docs/NOTION.local.md`와 OAuth token은 Git에 포함되지 않는다. `.codex/config.toml`에는 공개 endpoint와 승인 정책만 둔다.
+Multi-role routing도 선택적이다. 자세한 조건은 `docs/AGENT_ROLES.md`와 `.codex/agents/` 설정을 따르며, 모든 작업에 planner·approver·full regression을 강제하지 않는다.
 
 ## Verification
 
 ```bash
 ./scripts/check-public.sh
+bash scripts/check-role-contract.sh
 bash scripts/check-commit-scope.sh --range HEAD
-./scripts/verify.sh
+bash scripts/verify.sh --focused
+# release gate가 명시된 경우에만
+bash scripts/verify.sh --release
 ```
 
-`check-public.sh`는 커밋 후보 파일에서 흔한 secret 형식, 개인 홈 경로와 개인 Notion page 링크를 찾는 가벼운 검사다. 전문 secret scanner를 완전히 대체하지는 않는다.
+`verify.sh`는 manifest를 추측하거나 broad suite를 자동 실행하지 않는다. `--focused`는 `scripts/verify.project.sh`, `--release`는 `scripts/verify.release.sh`만 실행하며 hook이 없으면 `NOT_RUN`과 exit `2`를 반환한다. 실제 명령·결과와 실행하지 않은 검사는 `docs/EVIDENCE.md`에 구분해 기록한다.
 
-`verify.sh`는 프로젝트 manifest와 기존 script를 찾아 관련 검사를 실행한다. 지원할 검증을 찾지 못하면 성공으로 가장하지 않고 exit code `2`를 반환한다.
+`check-public.sh`는 흔한 secret 형식, 개인 홈 경로와 개인 Notion link를 찾는 가벼운 검사이며 전문 secret scanner를 완전히 대체하지 않는다.
 
 ## Release history
 
+### v1.3.0 — 2026-08-29 (candidate)
+
+- Luna implementation/test ownership과 조건부 Sol planner/approver/HIGH diagnosis를 정리했다.
+- common과 web overlay의 책임을 분리하고 common에 제품별 design·landing·browser baseline을 강제하지 않는다.
+- manifest 자동 탐색을 제거하고 explicit focused/release verification hook을 사용한다.
+- Notion schema와 sync 절차를 `docs/NOTION.local.example.md` 한 곳으로 모으고 usage ratio·강제 stage를 제거한다.
+- role 문서와 named config의 drift 검사 및 project/release hook example을 제공한다.
+- Java/Next/제품 도메인에 종속된 요구사항은 공통 템플릿에서 제거한다.
+
+Migration from v1.2:
+
+| v1.2 | v1.3 |
+|---|---|
+| Terra-main active default write owner | `luna_max` sole implementation/test owner |
+| Luna optional closed stage | Sol planner/approver/high are condition-based read-only roles |
+| `verify.sh` manifest auto-detection | `--focused` / `--release` explicit hooks |
+| common visual/landing baseline | web branch overlay; common neutral compatibility stubs |
+| Notion property contract mixed into requirements | optional Notion contract in `docs/NOTION.local.example.md` |
+| usage ratio and forced stages | actual evidence, risk and human decisions |
+| one-off model request | `EVIDENCE` provenance only; default role contract remains unchanged |
+
 ### v1.2.0 — 2026-08-10
 
-- Terra-main의 single-writer 구현과 제한된 Luna·`sol_approver`·`sol_high` 역할 경계를 추가했다.
-- focused-first verification, read-only final approval, human acceptance와 repeated-failure escalation을 연결했다.
-- `scripts/check-commit-scope.sh`와 staged `600` text lines / `12` text files review-stop gate를 추가했다.
+- Terra-main active default와 multi-stage routing을 사용한 이전 baseline이다. v1.3에서 현재 규칙으로 supersede된다.
+- focused-first verification, read-only approval, human acceptance와 repeated-failure escalation의 기록은 migration 참고용으로 보존한다.
 
 ### v1.1.0 — 2026-08-05
 
@@ -122,6 +153,8 @@ Upgrade notes:
 - Backend와 Frontend가 각각 보장하는 것이 구분된다.
 - 실패 응답이 만들어지고 표시되는 경로가 확인된다.
 - 관련 테스트가 무엇을 보장하고 보장하지 않는지 기록된다.
+- focused verification의 실제 명령·결과와 `NOT_RUN` 사유가 기록된다.
+- 필요한 technical review와 사람의 acceptance가 끝나기 전에는 `ACTIVE` 상태를 유지한다.
 - 실행한 검증과 남은 미확인 사항이 구분된다.
 
-구체적인 프롬프트 예시는 `PROMPTS.md`에 있다.
+공통 prompt는 `PROMPTS.md`에 있고, web-only prompt와 browser guidance는 `web` branch overlay에 둔다.

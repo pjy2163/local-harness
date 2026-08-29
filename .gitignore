@@ -40,4 +40,12 @@ __pycache__/
 coverage/
 dist/
 build/
+.gradle/
+target/
+bin/
+out/
+.next/
+.turbo/
+.nx/
+*.class
 *.log
