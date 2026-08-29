@@ -9,11 +9,11 @@ AI가 현재 요청과 저장소를 읽고 이 문서를 유지한다. 확인한
 | Project outcome | 사람이 흐름·계약·운영 경계를 소유하는 재사용 가능한 프로젝트 하네스 |
 | Primary user | AI와 함께 개인 프로젝트를 설계·구현·검증하는 사람 |
 | Active mode | `정리` |
-| Active requirement | `R-004` — v1.3 common/web harness and README v1.3 candidate |
+| Active requirement | `R-004` — v1.3 common/web harness and README v1.3 accepted baseline |
 | Active user flow | human-approved closed contract → implementation owner → conditional Sol review → review packet → human acceptance → closure batch |
-| Current work | v1.3 common candidate와 web overlay를 local branches에 정렬하고 review packet을 준비 중 |
-| Status | `ACTIVE` |
-| Next action | read-only Sol review → review/user acceptance → accepted only closure/push |
+| Current work | v1.3 common candidate와 web overlay를 privacy audit 후 GitHub에 non-force push하고 closure함 |
+| Status | `DONE` |
+| Next action | 첫 적용 프로젝트에서 실제 hook·요구사항·flow를 초기화한다. 다음 기능은 자동으로 시작하지 않는다 |
 | Last updated | `2026-08-29` |
 
 ## Current vertical slice
@@ -24,13 +24,13 @@ AI가 현재 요청과 저장소를 읽고 이 문서를 유지한다. 확인한
 - End boundary: evidence → review packet → human acceptance.
 - In scope: role routing, docs, README, common/web branches와 verification hooks.
 - Out of scope: TIEAT product code, Notion external write, deployment와 history rewrite.
-- Done when: `R-004` acceptance, focused evidence, technical review와 human acceptance가 끝난다.
+- Done when: `R-004` acceptance, focused evidence, technical review, human acceptance와 push가 끝난다.
 
 ## Data and contract status
 
 | Item | Source of Truth | State | Producer → Consumer | Contract location | Verified by |
 |---|---|---|---|---|---|
-| Approved baseline | `R-004` candidate; human acceptance pending | `MIXED` | Human/AI → v1.3 common baseline | `AGENTS.md`, role docs, skill | focused checks and local branch integration `PASS`; full docs review `NOT_RUN` |
+| Approved baseline | `R-004` accepted v1.3 baseline | `REAL` | Human/AI → v1.3 common baseline | `AGENTS.md`, role docs, skill | focused checks, Sol approval, human acceptance and non-force push `PASS` |
 | Harness setup flow | local Markdown | `REAL` | User request → project template | `AGENTS.md`, skill, `docs/SYSTEM_MAP.md` | reference check `PASS` |
 | Notion mirror | local Markdown이 SoT; remote는 선택적 mirror | `UNKNOWN` | local Markdown → Notion | `docs/NOTION.local.example.md` | `NOT_CONNECTED`; external write `NOT_RUN` |
 | Landing content | project facts / web overlay contract | `UNKNOWN` per project | Requirements·flow·evidence → landing UI | web branch `docs/LANDING.md` | browser/render `NOT_RUN` |
@@ -43,7 +43,7 @@ AI가 현재 요청과 저장소를 읽고 이 문서를 유지한다. 확인한
 | R-001 | 공통 엔지니어링·Decisions mirror·landing template | 반복되는 프로젝트 setup과 신뢰 경계를 공통화 | `DONE` | `docs/EVIDENCE.md` 2026-08-05 |
 | R-002 | v1.1 predecessor two-role routing | 책임 맥락과 구현 소음을 분리하고 단계별 비용·깊이를 제어 | `DONE` / v1.2에서 superseded | `docs/EVIDENCE.md` 2026-08-05 17:06 KST |
 | R-003 | Terra-main·Luna·Sol multi-stage routing | v1.2 historical baseline; v1.3에서 superseded | `DONE` / historical, superseded | `docs/EVIDENCE.md` 2026-08-10; human accepted |
-| R-004 | v1.3 common/web harness와 README v1.3 | 현재 partial implementation의 acceptance와 branch overlay를 닫음 | `ACTIVE` | current working tree; focused docs review pending |
+| R-004 | v1.3 common/web harness와 README v1.3 | common/web overlay, privacy audit와 remote delivery를 닫음 | `DONE` | `docs/EVIDENCE.md`; user accepted and pushed |
 
 ## Risks, assumptions and unknowns
 
@@ -53,8 +53,8 @@ AI가 현재 요청과 저장소를 읽고 이 문서를 유지한다. 확인한
 | External state | Notion target과 schema가 연결되지 않음 | 기술 결정은 local-only | 외부 write 요청 시 schema preview 후 사람이 승인 | Human + AI |
 | Reference gap | web 프로젝트의 visual reference가 아직 없음 | 특정 시각·콘텐츠 세부는 반영하지 않음 | 정확한 URL/screenshot으로 web override 작성 | Human |
 | Runtime | named role config는 새 trusted session에서만 role discovery를 검증할 수 있음 | v1.3 runtime spawn은 `NOT_RUN` | 다음 trusted session에서 필요할 때 focused role discovery 실행 | Human + AI |
-| Acceptance | v1.3 문서·README와 web overlay가 아직 사람 승인을 받지 않음 | closure 전 상태를 `ACTIVE`로 유지 | review packet 후 human decision | Human |
-| Branch/remote | local common/web branch 정렬은 완료했지만 GitHub push는 아직 수행하지 않음 | remote refs remain at v1.2 | review/acceptance 뒤 명시적 push | Human + AI |
+| Acceptance | v1.3 문서·README와 web overlay의 사람 승인이 완료됨 | future changes require a new review unit | 다음 요구사항에서 별도 acceptance | Human |
+| Branch/remote | local common/web branch 정렬과 GitHub non-force push가 완료됨 | future remote changes are outside this unit | 새 변경만 명시적으로 push | Human + AI |
 
 ## Human decisions needed
 
@@ -65,7 +65,7 @@ AI가 현재 요청과 저장소를 읽고 이 문서를 유지한다. 확인한
 
 ### Value now
 
-- Sol read-only review와 사용자 review packet을 완료한다.
+- 첫 적용 프로젝트에서 실제 focused/release hook과 제품 흐름을 초기화한다.
 
 ### Integration risk
 
