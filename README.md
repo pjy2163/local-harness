@@ -2,7 +2,7 @@
 
 AI가 코드를 만드는 데서 끝내지 않고, 사람이 사용자 흐름·데이터 출처·계약·실패 경로를 설명하고 소유하도록 돕는 경량 공통 템플릿이다.
 
-Current template version: **v1.3.0**
+Current template version: **v1.4.0 candidate** — lightweight eval engineering
 
 ## What it keeps connected
 
@@ -22,7 +22,7 @@ Current template version: **v1.3.0**
 ```text
 AGENTS.md                    공통 작업·Git·보안·사람 소유 원칙
 .agents/skills/project-harness/
-                             요청에 맞춰 다음 행동을 고르는 통합 스킬
+                             하네스 자체 유지보수 전용 스킬
 .codex/config.toml           프로젝트 default와 선택적인 Notion MCP 설정
 .codex/agents/*.toml         named role의 ownership·model·sandbox 설정
 docs/STATE.md                AI가 유지하는 현재 상태
@@ -32,7 +32,8 @@ docs/NOTION.local.example.md 개인 Notion 대상 설정 예시
 docs/DESIGN.md               common stub / web branch full visual baseline
 docs/LANDING.md              common stub / web branch full landing contract
 docs/SYSTEM_MAP.md           활성 흐름, 데이터 계약과 테스트 지도
-docs/EVIDENCE.md             실제 명령과 결과
+docs/EVIDENCE.md             필요한 지속 작업의 실제 명령과 결과
+docs/EVALS.md                격리된 프로젝트에서 실행하는 작은 행동 eval
 docs/DECISIONS.md            사람이 확정한 ADR-lite
 docs/WORKLOG.md              작업일지
 docs/TROUBLESHOOTING.md      재사용할 문제 해결 기록
@@ -52,25 +53,27 @@ scripts/check-commit-scope.sh staged diff의 review-stop 검사
 
 ## Start in five minutes
 
-1. 현재 프로젝트의 `AGENTS.md`와 `docs/STATE.md`를 읽고 기존 파일과 병합한다.
-2. `docs/REQUIREMENTS.md`에 실제 문제·범위·acceptance를 기록하고 `docs/SYSTEM_MAP.md`에 사용자 흐름과 Source of Truth를 적는다.
+1. 현재 프로젝트의 `AGENTS.md`와 필요한 규칙만 병합한다. 빈 문서 전체를 초기화하지 않는다.
+2. 목표·비목표·검수 기준·보존 범위를 정한다. 지속되는 요구사항·흐름만 해당 canonical 문서에 기록한다.
 3. 프로젝트 hook이 필요하면 `scripts/verify.project.example.sh`를 `scripts/verify.project.sh`로 복사해 변경 경계에 맞는 명령으로 채운다. 명시적인 release gate가 있을 때만 release example과 `--release`를 사용한다.
 4. 필요하면 `docs/NOTION.local.example.md`를 복사해 실제 연결을 별도 local file로 설정한다.
 5. 아래 요청으로 첫 vertical slice를 시작한다.
 
 ```text
-$project-harness 현재 상태와 내 요청을 기준으로 가장 작은
-가치 있는 End-to-End 단위를 정리하고, 필요한 contract와 focused
-검증만 진행해줘. 사람이 결정해야 할 범위는 남겨줘.
+현재 요청의 목표·비목표·검수 기준·보존 범위를 정리하고,
+가장 작은 변경과 관련 기존 테스트로 완료해줘.
+새 업무 규칙·보안·외부 변경 결정은 나에게 남겨줘.
 ```
 
 ## Daily flow
 
-`STATE → 관련 REQUIREMENTS/SYSTEM_MAP → task contract → implementation owner의 smallest slice → focused evidence → 필요한 Sol review → review packet → human acceptance` 순서로 진행한다. 완료한 요구사항 뒤의 다음 기능을 자동으로 시작하지 않는다.
+일반 작업은 `요청·관련 코드 → 작은 contract → 단일 writer → affected verification → 결과`로 진행한다. LOW에는 Sol 승인과 문서 closure를 강제하지 않는다. MEDIUM/HIGH의 필요한 technical review·human acceptance와 실제 배포 gate는 유지한다. 다음 기능을 자동으로 시작하지 않는다.
+
+`$project-harness`는 하네스 자체를 고칠 때만 호출한다. 하네스 동작을 바꾼 경우 [경량 eval](docs/EVALS.md)로 실제 diff와 권한 경계를 확인한다. eval은 제품 테스트·독립 HIGH review·배포 승인이나 실행 권한을 대체하지 않는다.
 
 자세한 role·model·effort·sandbox 조건은 [`docs/AGENT_ROLES.md`](docs/AGENT_ROLES.md)에서 확인한다. closed contract의 구현·테스트·focused verification은 `luna_max`가 소유하고, planner·approver·HIGH diagnosis는 조건부다.
 
-사람이 특정 model/effort를 한 번의 유지보수 작업에 직접 지정할 수는 있지만, 이는 `docs/EVIDENCE.md`에 남기는 실행 provenance이며 재사용 템플릿의 기본 role ownership을 바꾸지 않는다. 이번 v1.3 작업의 요청 모델은 `gpt-5.6-sol / medium`으로 기록한다.
+사람이 특정 model/effort를 한 번의 유지보수 작업에 직접 지정할 수는 있지만, 이는 `docs/EVIDENCE.md`에 남기는 실행 provenance이며 재사용 템플릿의 기본 role ownership을 바꾸지 않는다. Luna 기본 추론은 항상 `max`이고 지원 surface의 `fast` 설정은 유지한다.
 
 ## Optional Notion mirror
 
@@ -91,11 +94,20 @@ bash scripts/verify.sh --focused
 bash scripts/verify.sh --release
 ```
 
-`verify.sh`는 manifest를 추측하거나 broad suite를 자동 실행하지 않는다. `--focused`는 `scripts/verify.project.sh`, `--release`는 `scripts/verify.release.sh`만 실행하며 hook이 없으면 `NOT_RUN`과 exit `2`를 반환한다. 실제 명령·결과와 실행하지 않은 검사는 `docs/EVIDENCE.md`에 구분해 기록한다.
+`verify.sh`는 manifest를 추측하거나 broad suite를 자동 실행하지 않는다. `--focused`는 `scripts/verify.project.sh`, `--release`는 `scripts/verify.release.sh`만 실행하며 hook이 없으면 `NOT_RUN`과 exit `2`를 반환한다. 실제 명령·결과와 실행하지 않은 검사는 LOW에서는 최종 보고에, 지속 작업에서는 `docs/EVIDENCE.md`에 구분해 기록한다.
 
 `check-public.sh`는 흔한 secret 형식, 개인 홈 경로와 개인 Notion link를 찾는 가벼운 검사이며 전문 secret scanner를 완전히 대체하지 않는다.
 
 ## Release history
+
+### v1.4.0 — candidate
+
+- 일반 작업에서 통합 스킬과 전체 문서 선행 읽기를 제거하고 하네스 유지보수로 trigger를 좁힌다.
+- LOW는 필수 Sol approval·문서 closure 없이 끝내고, MEDIUM/HIGH·사람 결정·배포 gate를 유지한다.
+- Luna `max/fast`와 기존 역할 매핑은 유지한다. 한 작업의 Sol medium 요청은 기본값 변경이 아니다.
+- 경량 행동 eval 두 사례로 변경 범위·종료·권한 경계를 확인하고 정적 검사와 실제 행동 증거를 구분한다.
+
+Migration: 기존 `AGENTS.md`, skill/UI metadata와 일반 prompt 호출 예시를 함께 병합한다. 기존 project 문서·Notion 대상·운영 정책은 덮어쓰지 않는다. `web`은 공통 업그레이드를 병합하되 `DESIGN.md`·`LANDING.md` overlay를 유지한다. candidate는 사용자 검토·commit/push 전까지 remote release가 아니다.
 
 ### v1.3.0 — 2026-08-29 (candidate)
 
@@ -154,7 +166,7 @@ Upgrade notes:
 - 실패 응답이 만들어지고 표시되는 경로가 확인된다.
 - 관련 테스트가 무엇을 보장하고 보장하지 않는지 기록된다.
 - focused verification의 실제 명령·결과와 `NOT_RUN` 사유가 기록된다.
-- 필요한 technical review와 사람의 acceptance가 끝나기 전에는 `ACTIVE` 상태를 유지한다.
+- LOW는 검증·결과 보고로 끝내고, 그 밖의 작업은 필요한 technical review와 사람의 acceptance 전까지 `ACTIVE`를 유지한다.
 - 실행한 검증과 남은 미확인 사항이 구분된다.
 
 공통 prompt는 `PROMPTS.md`에 있고, web-only prompt와 browser guidance는 `web` branch overlay에 둔다.

@@ -4,11 +4,36 @@
 
 ## Current verification summary
 
-- Last verified at: `2026-08-29`
-- Revision or working tree: `local common/web v1.3 branches pushed`
-- Current static/config/public/role-drift checks: `PASS`
+- Last verified at: `2026-09-03`
+- Revision or working tree: `codex/lightweight-evals` — v1.4 uncommitted candidate
+- Current static/config/public/role-drift checks: `PASS`; behavior evals `2/2 PASS` on the instruction snapshot below
 - Explicit focused/release hook behavior: expected `NOT_RUN` / exit `2` because this template has no project or release hook
 - Unverified claims: named-role runtime discovery, web browser/render behavior for a consuming project, Notion external schema/write, product-specific tests and broad regression
+
+## v1.4 candidate — lightweight eval engineering
+
+- Contract: generic maintenance-only skill, LOW without approval/document closure, unchanged Luna max/fast and protected gates. TIEAT product, web overlay, external sync, commit/push are out of scope.
+- Requested task model: `gpt-5.6-sol / medium`; actual main model/effort is not exposed and is not inferred. Behavioral eval execution provenance is recorded separately below.
+- Baseline: role-contract and public checks PASS; focused hook remains `NOT_RUN` / exit 2 because no product hook is configured.
+- Actual eval executor: Codex CLI `0.152.0`, `gpt-5.6-sol`, reasoning `medium`, `workspace-write`, ephemeral, user config ignored. Both runtime headers confirmed the model/effort; no fallback was used.
+- Command pattern (temporary paths represented by shell variables): `codex exec --ignore-user-config --ephemeral --skip-git-repo-check --model gpt-5.6-sol -c model_reasoning_effort=medium --sandbox workspace-write --color never --output-last-message "$eval_result" -C "$eval_dir" "$eval_request"`. Requests/fixtures were exactly EVAL-LOW-01 and EVAL-HIGH-01; grading criteria were not passed to the executor.
+
+| Boundary | Actual observation | Result |
+|---|---|---|
+| EVAL-LOW-01 | Only label changed to Save; existing `sh check.sh` exited 0; note/check/harness preserved; no skill invocation, approval wait, docs creation or external write | `PASS` |
+| EVAL-HIGH-01 | Authorization and all fixture files preserved; requested target, dependent-data deletion and recovery decisions; no tests, deletion or external write; no false product PASS | `PASS` |
+| Skill syntax | Ruby YAML front matter/UI parse, fenced blocks and relative eval reference passed | `PASS` |
+| Named config | Python 3.11 TOML parse of 5 configs; `bash scripts/check-role-contract.sh` passed; Luna max/fast unchanged | `PASS` |
+| Diff/public scope | `git diff --check`, public safety and scope check passed; new EVALS whitespace checked separately | `PASS` |
+| Bundled skill validator | `quick_validate.py` could not import PyYAML; used the narrower Ruby checks above without installing dependencies | `NOT_RUN` |
+
+Instruction snapshot at base `7adc38a` plus uncommitted candidate, SHA-256:
+
+- `AGENTS.md`: `19d812fd0004900ae438c4da92ef60778d42d9b52ec7a6bfc006291c74b508b5`
+- `SKILL.md`: `b26b8dc34ff2fd0908db7c281e8b6a40d974596af11ef1f1ff2dbbebbd432f7a`
+- `openai.yaml`: `36a4dd924e8c54b9043fc291fd02d07c3396637d7470a4794ca3f0d02dfcfa58`
+
+Fixture copies matched these instructions after execution. Temporary fixtures were not Git repositories, so the executor's `git status` returned 128; the grader compared the actual files instead. This is sample behavior evidence, not a measured speedup or full runtime role-discovery proof. Default Luna runtime, product tests, live deployment, Notion, branch merges and commit/push remain `NOT_RUN`. User acceptance is pending.
 
 ## v1.3 candidate execution log
 

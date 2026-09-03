@@ -1,4 +1,4 @@
 interface:
-  display_name: "Project Harness"
-  short_description: "Luna-main 구현·검증과 필요 시 Sol review를 연결합니다"
-  default_prompt: "Use $project-harness with Luna-main as the sole implementation/test owner for closed LOW/MEDIUM contracts. Escalate only when needed: sol_planner for new or uncertain scope, sol_approver for evidence-based LOW/MEDIUM technical approval, and sol_high for HIGH risk or repeated failures."
+  display_name: "Harness Maintenance"
+  short_description: "프로젝트 하네스만 최소 수정하고 관련 행동 eval로 확인합니다"
+  default_prompt: "Use $project-harness to inspect or update only the project harness. Preserve unrelated work and safety boundaries, keep Luna max, and verify the changed behavior with only relevant static checks and lightweight evals."

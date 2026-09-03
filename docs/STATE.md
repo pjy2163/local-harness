@@ -8,15 +8,17 @@ AI가 현재 요청과 저장소를 읽고 이 문서를 유지한다. 확인한
 |---|---|
 | Project outcome | 사람이 흐름·계약·운영 경계를 소유하는 재사용 가능한 프로젝트 하네스 |
 | Primary user | AI와 함께 개인 프로젝트를 설계·구현·검증하는 사람 |
-| Active mode | `정리` |
-| Active requirement | `R-004` — v1.3 common/web harness and README v1.3 accepted baseline |
-| Active user flow | human-approved closed contract → implementation owner → conditional Sol review → review packet → human acceptance → closure batch |
-| Current work | v1.3 common candidate와 web overlay를 privacy audit 후 GitHub에 non-force push하고 closure함 |
-| Status | `DONE` |
-| Next action | 첫 적용 프로젝트에서 실제 hook·요구사항·flow를 초기화한다. 다음 기능은 자동으로 시작하지 않는다 |
-| Last updated | `2026-08-29` |
+| Active mode | `구현·검증` |
+| Active requirement | v1.4 lightweight eval candidate; R-004는 승인된 기존 baseline |
+| Active user flow | 작은 contract → 단일 writer → affected evidence → LOW 보고 / 필요한 고위험 review |
+| Current work | 유지보수 전용 skill·LOW 종료 경량화와 행동 eval 두 사례를 공통 candidate에 반영 |
+| Status | `ACTIVE` — static checks and behavior evals 2/2 PASS; user acceptance pending |
+| Next action | 사용자 검토 뒤 commit/push와 common/web 반영 여부를 결정한다. 현재는 로컬 candidate |
+| Last updated | `2026-09-03` |
 
 ## Current vertical slice
+
+현재 v1.4의 범위·검수 결과는 `docs/EVIDENCE.md`의 candidate 항목을 따른다. 아래 R-004 설명과 완료 이력은 v1.3 baseline이며 이번 candidate의 PASS 또는 배포 승인이 아니다.
 
 - User action: template owner가 common 또는 web variant를 선택하고 closed contract를 시작한다.
 - Visible result: 단일 implementation writer, 조건부 Sol review와 explicit verification 경계가 문서·config에 연결된다.
