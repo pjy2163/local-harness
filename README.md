@@ -2,7 +2,9 @@
 
 AI가 코드를 만드는 데서 끝내지 않고, 사람이 사용자 흐름·데이터 출처·계약·실패 경로를 설명하고 소유하도록 돕는 경량 공통 템플릿이다.
 
-Current template version: **v1.4.0 candidate** — lightweight eval engineering
+Current template version: **v1.4.0** — lightweight eval engineering
+
+2026-09-03 로컬 `main`·`app`·`web` 반영 완료. 원격 push는 하지 않았으며 GitHub 배포 완료를 뜻하지 않는다.
 
 ## What it keeps connected
 
@@ -47,9 +49,15 @@ scripts/check-commit-scope.sh staged diff의 review-stop 검사
 
 ## Choose common or web
 
-- `main`, `app`, `codex/harness-common-v1-2`는 공통 workflow·계약·검증 하네스다.
-- `web`은 공통 하네스 위에 디자인, landing, browser/screenshot guidance를 얹는 variant다. 공통 branch에는 특정 색상이나 제품 visual baseline을 강제하지 않는다.
-- 공통만 필요한 CLI/API/데이터 프로젝트는 common branch에서 시작한다. 화면·랜딩을 만드는 프로젝트만 `web` overlay를 선택한다.
+| Branch | 로컬 적용 상태와 용도 |
+|---|---|
+| `main` | v1.4 공통 기준. 새 CLI/API/데이터 프로젝트의 기본 시작점 |
+| `app` | `main`과 같은 v1.4 공통 내용. 별도 app 전용 규칙 없음 |
+| `web` | v1.4 공통 기준 + 기존 `docs/DESIGN.md`·`docs/LANDING.md` overlay |
+| `codex/harness-common-v1-2` | 이전 v1.3 기준을 보존한 이력 브랜치. 새 프로젝트 시작점으로 사용하지 않음 |
+
+화면·랜딩을 만드는 프로젝트만 `web`을 선택한다. 공통 branch에는 특정 색상이나 제품 visual baseline을 강제하지 않는다.
+현재 v1.4는 이 로컬 저장소에서 선택할 수 있다. GitHub에서 새로 가져올 경우 별도 push 후 해당 branch에 v1.4가 있는지 확인한다.
 
 ## Start in five minutes
 
@@ -100,14 +108,16 @@ bash scripts/verify.sh --release
 
 ## Release history
 
-### v1.4.0 — candidate
+### v1.4.0 — 2026-09-03 (local applied; not pushed)
 
 - 일반 작업에서 통합 스킬과 전체 문서 선행 읽기를 제거하고 하네스 유지보수로 trigger를 좁힌다.
 - LOW는 필수 Sol approval·문서 closure 없이 끝내고, MEDIUM/HIGH·사람 결정·배포 gate를 유지한다.
 - Luna `max/fast`와 기존 역할 매핑은 유지한다. 한 작업의 Sol medium 요청은 기본값 변경이 아니다.
 - 경량 행동 eval 두 사례로 변경 범위·종료·권한 경계를 확인하고 정적 검사와 실제 행동 증거를 구분한다.
+- 사용자 승인 후 공통 변경을 `main`·`app`에 fast-forward하고 `web`에 병합했다. web 전용 디자인 두 파일과 이전 이력 브랜치는 보존했다.
+- 행동 eval `2/2 PASS`, role/public/scope 검사 통과. 제품 테스트·배포 검증·속도 개선 수치·Luna 실제 실행 검증은 포함하지 않는다. 실제 결과는 [EVIDENCE](docs/EVIDENCE.md)에 기록했다.
 
-Migration: 기존 `AGENTS.md`, skill/UI metadata와 일반 prompt 호출 예시를 함께 병합한다. 기존 project 문서·Notion 대상·운영 정책은 덮어쓰지 않는다. `web`은 공통 업그레이드를 병합하되 `DESIGN.md`·`LANDING.md` overlay를 유지한다. candidate는 사용자 검토·commit/push 전까지 remote release가 아니다.
+Migration: 기존 `AGENTS.md`, skill/UI metadata, LOW 종료 조건이 바뀐 named-agent 지침과 일반 prompt 호출 예시를 함께 병합한다. `docs/EVALS.md`는 하네스 변경 평가용으로 가져오되 기존 project 문서·Notion 대상·운영 정책은 덮어쓰지 않는다. `web`은 공통 업그레이드를 병합하되 `DESIGN.md`·`LANDING.md` overlay를 유지한다. 새 세션에서 설정을 확인하고 프로젝트에 필요한 focused hook만 초기화한다.
 
 ### v1.3.0 — 2026-08-29 (candidate)
 

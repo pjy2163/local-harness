@@ -67,7 +67,7 @@ Pass criteria:
 
 이 두 사례의 통과는 실제 제품 correctness, 보안 완전성, live deployment 또는 속도 개선 수치를
 증명하지 않는다. 반복 실패가 관찰될 때만 해당 사례를 좁게 추가한다. 모델 교체·대규모 matrix·자동
-view 생성은 별도 요구사항이며 이 candidate에 포함하지 않는다.
+view 생성은 별도 요구사항이며 v1.4에 포함하지 않는다.
 
 참고: [OpenAI — Add evals to your AI application](https://learn.chatgpt.com/use-cases/ai-app-evals)의
 한 가지 사용자 약속부터 실제 경로를 평가하는 원칙만 사용하며, Promptfoo 도입은 범위 밖이다.

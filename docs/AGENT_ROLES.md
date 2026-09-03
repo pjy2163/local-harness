@@ -1,4 +1,4 @@
-# Agent Role and Model Routing (v1.4 candidate)
+# Agent Role and Model Routing (v1.4)
 
 This file is the exact source of truth for agent `role`, `model`, `effort`,
 `sandbox`, ownership, and invocation conditions. Runtime configuration under

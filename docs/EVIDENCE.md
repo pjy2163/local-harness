@@ -5,14 +5,30 @@
 ## Current verification summary
 
 - Last verified at: `2026-09-03`
-- Revision or working tree: `codex/lightweight-evals` — v1.4 uncommitted candidate
+- Revision or working tree: v1.4 source `f944c0a`, local main/app and web integration verified; publication `NOT_RUN`
 - Current static/config/public/role-drift checks: `PASS`; behavior evals `2/2 PASS` on the instruction snapshot below
 - Explicit focused/release hook behavior: expected `NOT_RUN` / exit `2` because this template has no project or release hook
 - Unverified claims: named-role runtime discovery, web browser/render behavior for a consuming project, Notion external schema/write, product-specific tests and broad regression
 
-## v1.4 candidate — lightweight eval engineering
+## v1.4 local integration — 2026-09-03
 
-- Contract: generic maintenance-only skill, LOW without approval/document closure, unchanged Luna max/fast and protected gates. TIEAT product, web overlay, external sync, commit/push are out of scope.
+- Authorization: user accepted the candidate and explicitly approved local commits/merges for main/app/web plus README updates. Remote push was excluded.
+- Source commit: `f944c0a` (`feat: 경량 eval 하네스 v1.4 적용`); main/app fast-forwarded to it. Initial web integration: `e8b766f`, preserving the existing overlay. This snapshot precedes the documentation-only status update.
+- Existing `codex/harness-common-v1-2` stayed at `7adc38a`; no branch deletion or history rewrite. Configured non-personal commit identity matched the existing baseline; no identity change.
+
+| Boundary | Actual command / observation | Result |
+|---|---|---|
+| Commit scope | `git diff --cached --check`; `bash scripts/check-commit-scope.sh --staged`; staged stat/diff reviewed: 11 files, 423 changed lines | `PASS` |
+| Common alignment | `git diff --exit-code main app` exited 0; both refs at source commit | `PASS` |
+| Web ancestry | `git merge-base --is-ancestor main web` exited 0 | `PASS` |
+| Overlay preservation | `git diff --exit-code e765a3a web -- docs/DESIGN.md docs/LANDING.md` exited 0; `git diff --name-status main..web` showed only those two files | `PASS` |
+| Merged static checks | `bash scripts/check-role-contract.sh`; `bash scripts/check-public.sh` passed on the web merge candidate; common checks also passed before commit | `PASS` |
+| Eval provenance | Instruction SHA-256 values below unchanged before commit; no behavioral changes in branch integration, so no duplicate eval run | `PASS` |
+| External delivery | No push, deployment or Notion write requested or executed | `NOT_RUN` |
+
+## v1.4 behavior eval — lightweight eval engineering
+
+- Candidate-stage contract: generic maintenance-only skill, LOW without approval/document closure, unchanged Luna max/fast and protected gates. TIEAT product, web overlay changes and external sync were excluded; local commit/merge was separately authorized above.
 - Requested task model: `gpt-5.6-sol / medium`; actual main model/effort is not exposed and is not inferred. Behavioral eval execution provenance is recorded separately below.
 - Baseline: role-contract and public checks PASS; focused hook remains `NOT_RUN` / exit 2 because no product hook is configured.
 - Actual eval executor: Codex CLI `0.152.0`, `gpt-5.6-sol`, reasoning `medium`, `workspace-write`, ephemeral, user config ignored. Both runtime headers confirmed the model/effort; no fallback was used.
@@ -27,13 +43,13 @@
 | Diff/public scope | `git diff --check`, public safety and scope check passed; new EVALS whitespace checked separately | `PASS` |
 | Bundled skill validator | `quick_validate.py` could not import PyYAML; used the narrower Ruby checks above without installing dependencies | `NOT_RUN` |
 
-Instruction snapshot at base `7adc38a` plus uncommitted candidate, SHA-256:
+Instruction snapshot evaluated at base `7adc38a` plus the then-uncommitted candidate, now committed as `f944c0a`, SHA-256:
 
 - `AGENTS.md`: `19d812fd0004900ae438c4da92ef60778d42d9b52ec7a6bfc006291c74b508b5`
 - `SKILL.md`: `b26b8dc34ff2fd0908db7c281e8b6a40d974596af11ef1f1ff2dbbebbd432f7a`
 - `openai.yaml`: `36a4dd924e8c54b9043fc291fd02d07c3396637d7470a4794ca3f0d02dfcfa58`
 
-Fixture copies matched these instructions after execution. Temporary fixtures were not Git repositories, so the executor's `git status` returned 128; the grader compared the actual files instead. This is sample behavior evidence, not a measured speedup or full runtime role-discovery proof. Default Luna runtime, product tests, live deployment, Notion, branch merges and commit/push remain `NOT_RUN`. User acceptance is pending.
+Fixture copies matched these instructions after execution. Temporary fixtures were not Git repositories, so the executor's `git status` returned 128; the grader compared the actual files instead. This is sample behavior evidence, not a measured speedup or full runtime role-discovery proof. Default Luna runtime, product tests, live deployment, Notion and remote push remain `NOT_RUN`. Subsequent user acceptance and local integration are recorded above.
 
 ## v1.3 candidate execution log
 
