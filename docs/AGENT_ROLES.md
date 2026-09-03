@@ -1,4 +1,4 @@
-# Agent Role and Model Routing (v1.3)
+# Agent Role and Model Routing (v1.4 candidate)
 
 This file is the exact source of truth for agent `role`, `model`, `effort`,
 `sandbox`, ownership, and invocation conditions. Runtime configuration under
@@ -28,9 +28,10 @@ ownership or fallback rule.
 A human may explicitly select a model and effort for one maintenance task. The
 requested and actual setting, result, and any limitation belong in
 `docs/EVIDENCE.md`; they do not silently rewrite this reusable role map. For
-the v1.3 maintenance request, `gpt-5.6-sol / medium` was the requested task
-model. The default v1.3 contract remains `luna_max` as the implementation/test
-owner, with Sol roles read-only and conditional.
+one-off maintenance request, the requested setting is task provenance only.
+The reusable default remains `luna_max` with `max` reasoning and `fast` where
+supported; do not lower Luna's default effort to reduce process overhead.
+Named Sol roles remain read-only and conditional.
 
 ## Role map
 
@@ -38,7 +39,7 @@ owner, with Sol roles read-only and conditional.
 |---|---|---|---|---|
 | `luna_max` | `gpt-5.6-luna` / `max` / `fast` | `workspace-write` | Sole write owner for a closed `LOW/MEDIUM` contract: production code, tests, focused verification, fixes, and required documentation sync. | Existing human decisions close the rules and scope. |
 | `sol_planner` | `gpt-5.6-sol` / `max` | `read-only` | Returns only outcome, in/out of scope, acceptance, risk, focused verification, and human decisions needed. | A new feature or unclear scope needs a bounded contract. |
-| `sol_approver` | `gpt-5.6-sol` / `medium` | `read-only` | Performs only the configured gate or necessary technical approval after `LOW/MEDIUM` evidence. Returns read-only findings. | Final evidence exists and the configured/needed approval condition applies. |
+| `sol_approver` | `gpt-5.6-sol` / `medium` | `read-only` | Performs required technical approval using final evidence; returns read-only findings. | LOW only on explicit request; otherwise when the configured/needed approval condition applies. |
 | `sol_high` | `gpt-5.6-sol` / `xhigh` | `read-only` | Returns diagnosis and a bounded contract only; it does not implement or test. | A `HIGH`-risk judgment is required, or the same failure remains after two complete `fix → affected-test rerun` cycles. |
 
 All Sol roles are read-only: they do not modify or execute production code,
@@ -84,12 +85,19 @@ HIGH-risk judgment or repeated failure
   → luna_max: implementation and verification
 ```
 
-The planner is not mandatory for a closed contract. The approver is not
-mandatory for every task. Human acceptance is not replaced by either role.
+The planner is not mandatory for a closed contract. LOW is a local, closed
+copy/mechanical change, not an API/data/shared-logic/configuration or protected
+boundary change. LOW ends with affected checks and a result report; do not
+require Sol approval, a separate human acceptance wait, or STATE/EVIDENCE/WORKLOG/
+Notion closure unless the user explicitly requests it. Reclassify if risk emerges.
+For MEDIUM/HIGH, preserve required technical review and human acceptance.
+Unavailable optional reviewers do not block LOW. High-risk and deployment
+assurance are never inferred from LOW completion or static checks.
 
 ## Task contract
 
-Every Luna write unit stays inside this bounded contract:
+Use a short goal/non-goal/acceptance/unchanged-scope contract for LOW. The
+following expanded contract is for changes that actually need these fields:
 
 ```text
 Outcome:
@@ -128,4 +136,5 @@ runtime role-discovery or permission proof.
 Earlier v1.2 material described Terra-main as the active default write owner
 and used older routing details. That history is retained only as provenance;
 it is superseded and is not an active role, model, or ownership rule. The v1.3
-contract above is authoritative.
+contract is superseded by the v1.4 LOW completion policy above; unchanged model
+and safety boundaries remain authoritative.
