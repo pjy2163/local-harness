@@ -6,6 +6,14 @@ Current template version: **v1.4.0** — lightweight eval engineering
 
 2026-09-03 로컬 `main`·`app`·`web` 반영 완료. 원격 push는 하지 않았으며 GitHub 배포 완료를 뜻하지 않는다.
 
+<br><br/>
+
+## 하네스 발전 과정 요약
+
+<img width="400" alt="하네스 발전 과정 요약" src="https://github.com/user-attachments/assets/d1957083-f650-4228-b322-50ff08114007" />
+
+
+
 ## What it keeps connected
 
 - 공통 Git·보안 원칙
